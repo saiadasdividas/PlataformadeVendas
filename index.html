@@ -1034,7 +1034,7 @@
                 throw new Error('Permissão negada');
             }
 
-            await db.collection('users').doc(uid).update({
+            await fsUpdate('users', uid, {
                 profile: {
                     ...profileData,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2918,14 +2918,13 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Funções de gamificação
         async function awardPoints(userId, points, reason) {
             try {
-                const userRef = db.collection('users').doc(userId);
-                await userRef.update({
+                await fsUpdate('users', userId, {
                     'stats.totalPoints': firebase.firestore.FieldValue.increment(points),
                     'stats.lastActivity': firebase.firestore.FieldValue.serverTimestamp()
                 });
-                
+
                 // Registrar atividade
-                await db.collection('activities').add({
+                await fsAdd('activities', {
                     userId: userId,
                     type: 'points_awarded',
                     points: points,
@@ -2974,7 +2973,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Funções de CRM
         async function addProspect(prospectData) {
             try {
-                await db.collection('prospects').add({
+                await fsAdd('prospects', {
                     ...prospectData,
                     createdBy: currentUser.uid,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -2991,7 +2990,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         async function updateProspectStatus(prospectId, newStatus) {
             try {
-                await db.collection('prospects').doc(prospectId).update({
+                await fsUpdate('prospects', prospectId, {
                     status: newStatus,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -3019,7 +3018,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Funções de MR Representações
         async function completeTask(taskId) {
             try {
-                await db.collection('tasks').doc(taskId).update({
+                await fsUpdate('tasks', taskId, {
                     completed: true,
                     completedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     completedBy: currentUser.uid
@@ -3038,7 +3037,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         async function addTask(taskData) {
             try {
-                await db.collection('tasks').add({
+                await fsAdd('tasks', {
                     ...taskData,
                     createdBy: currentUser.uid,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -3055,7 +3054,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Funções de Academia
         async function startModule(moduleId) {
             try {
-                await db.collection('user_modules').doc(`${currentUser.uid}_${moduleId}`).set({
+                await fsSet('user_modules', `${currentUser.uid}_${moduleId}`, {
                     userId: currentUser.uid,
                     moduleId: moduleId,
                     startedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -3072,7 +3071,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         async function completeModule(moduleId) {
             try {
-                await db.collection('user_modules').doc(`${currentUser.uid}_${moduleId}`).update({
+                await fsUpdate('user_modules', `${currentUser.uid}_${moduleId}`, {
                     completed: true,
                     completedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     progress: 100
@@ -3167,11 +3166,126 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Detectar modo offline/online
         window.addEventListener('online', () => {
             showNotification('Conexão restaurada!', 'success');
+            processOfflineQueue();
         });
 
         window.addEventListener('offline', () => {
             showNotification('Você está offline. Algumas funcionalidades podem não estar disponíveis.', 'warning');
         });
+
+        // ----- Fila offline utilizando IndexedDB -----
+        let queueDbPromise;
+
+        function getQueueDb() {
+            if (queueDbPromise) return queueDbPromise;
+            queueDbPromise = new Promise((resolve, reject) => {
+                const req = indexedDB.open('offline-queue', 1);
+                req.onupgradeneeded = () => {
+                    req.result.createObjectStore('operations', { keyPath: 'id', autoIncrement: true });
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+            return queueDbPromise;
+        }
+
+        async function queueOperation(op) {
+            const dbInst = await getQueueDb();
+            return new Promise((resolve, reject) => {
+                const tx = dbInst.transaction('operations', 'readwrite');
+                tx.objectStore('operations').add(op);
+                tx.oncomplete = resolve;
+                tx.onerror = tx.onabort = reject;
+            });
+        }
+
+        async function getQueuedOperations() {
+            const dbInst = await getQueueDb();
+            return new Promise((resolve, reject) => {
+                const tx = dbInst.transaction('operations', 'readonly');
+                const req = tx.objectStore('operations').getAll();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function clearQueuedOperations() {
+            const dbInst = await getQueueDb();
+            return new Promise((resolve, reject) => {
+                const tx = dbInst.transaction('operations', 'readwrite');
+                tx.objectStore('operations').clear();
+                tx.oncomplete = resolve;
+                tx.onerror = tx.onabort = reject;
+            });
+        }
+
+        function registerBackgroundSync() {
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                navigator.serviceWorker.ready.then(reg => {
+                    reg.sync.register('background-sync').catch(err => console.error('Erro ao registrar sync', err));
+                });
+            }
+        }
+
+        async function processOfflineQueue() {
+            if (!navigator.onLine) return;
+            try {
+                const ops = await getQueuedOperations();
+                for (const op of ops) {
+                    try {
+                        if (op.method === 'add') {
+                            await db.collection(op.collection).add(op.data);
+                        } else if (op.method === 'update') {
+                            await db.collection(op.collection).doc(op.docId).update(op.data);
+                        } else if (op.method === 'set') {
+                            await db.collection(op.collection).doc(op.docId).set(op.data);
+                        }
+                    } catch (err) {
+                        console.error('Erro ao reenviar operação offline', err);
+                    }
+                }
+                await clearQueuedOperations();
+                if (ops.length) showNotification('Dados offline sincronizados', 'success');
+            } catch (err) {
+                console.error('Erro ao processar fila offline', err);
+            }
+        }
+
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'process-queue') {
+                processOfflineQueue();
+            }
+        });
+
+        async function fsAdd(collection, data) {
+            if (!navigator.onLine) {
+                await queueOperation({ method: 'add', collection, data });
+                registerBackgroundSync();
+                showNotification('Alteração salva offline', 'info');
+                return Promise.resolve();
+            }
+            return db.collection(collection).add(data);
+        }
+
+        async function fsUpdate(collection, docId, data) {
+            if (!navigator.onLine) {
+                await queueOperation({ method: 'update', collection, docId, data });
+                registerBackgroundSync();
+                showNotification('Alteração salva offline', 'info');
+                return Promise.resolve();
+            }
+            return db.collection(collection).doc(docId).update(data);
+        }
+
+        async function fsSet(collection, docId, data) {
+            if (!navigator.onLine) {
+                await queueOperation({ method: 'set', collection, docId, data });
+                registerBackgroundSync();
+                showNotification('Alteração salva offline', 'info');
+                return Promise.resolve();
+            }
+            return db.collection(collection).doc(docId).set(data);
+        }
 
         // Função para salvar dados localmente quando offline
         function saveOfflineData(key, data) {
@@ -3245,7 +3359,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         // Função para feedback do usuário
         function submitFeedback(feedback) {
-            db.collection('feedback').add({
+            fsAdd('feedback', {
                 userId: currentUser.uid,
                 message: feedback.message,
                 rating: feedback.rating,
