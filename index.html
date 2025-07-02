@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Embalagens Conceito</title>
-    <script src="vendor/firebase/firebase-app-compat.js"></script>
-    <script src="vendor/firebase/firebase-auth-compat.js"></script>
-    <script src="vendor/firebase/firebase-firestore-compat.js"></script>
-    <script src="vendor/firebase/firebase-storage-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plataforma Embalagens Conceito</title>
+   <!-- Firebase SDKs -->
+  <script src="vendor/firebase/firebase-app-compat.js"></script>
+  <script src="vendor/firebase/firebase-auth-compat.js"></script>
+  <script src="vendor/firebase/firebase-firestore-compat.js"></script>
+  <script src="vendor/firebase/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Carrega configuracoes do Firebase antes do script principal -->
        
-    <link href="vendor/fontawesome/css/all.min.css" rel="stylesheet">
-    <style>
+    <!-- Seus estilos -->
+  <link href="vendor/fontawesome/css/all.min.css" rel="stylesheet">
+  <link href="styles.css" rel="stylesheet">
+
+  <style>
         * {
             margin: 0;
             padding: 0;
@@ -736,9 +740,9 @@
         .notification.warning { background: var(--warning); }
         .notification.info { background: var(--primary); }
     </style>
+    <script src="config.js"></script>
+  <script src="main.js"></script>
 </head>
-     <script src="config.js"></script>
-    <script src="main.js"></script>
 <body>
     <!-- Login Page -->
     <div id="loginPage" class="login-container">
