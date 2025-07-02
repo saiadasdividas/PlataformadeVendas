@@ -2803,6 +2803,8 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
             console.log('Admin scripts initialized');
         }
 
+        // User role management functions
+
         async function loadAllUsers() {
             const snapshot = await db.collection('users').get();
             const users = [];
