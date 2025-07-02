@@ -113,12 +113,13 @@ self.addEventListener('sync', (event) => {
 });
 
 function doBackgroundSync() {
-  // Implementar sincronização de dados em background
-  self.registration.showNotification('Sincronização em background', {
-    body: 'Dados sendo sincronizados',
-    icon: '/icon-192x192.png'
+  return self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => client.postMessage({ type: 'process-queue' }));
+    self.registration.showNotification('Sincronização em background', {
+      body: 'Dados sincronizados',
+      icon: '/icon-192x192.png'
+    });
   });
-  return Promise.resolve();
 }
 
 // Compartilhamento
