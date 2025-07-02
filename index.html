@@ -705,6 +705,34 @@
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
         .gap-16 { gap: 16px; }
+
+        /* Notificações */
+        #notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .notification {
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: #fff;
+            box-shadow: var(--card-shadow);
+            opacity: 0.9;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .notification.hide {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        .notification.success { background: var(--success); }
+        .notification.error { background: var(--error); }
+        .notification.warning { background: var(--warning); }
+        .notification.info { background: var(--primary); }
     </style>
 </head>
 <body>
@@ -2684,12 +2712,12 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         function initAcademiaScripts() {
             // Scripts específicos da academia
-            console.log('Academia scripts initialized');
+            showNotification('Academia pronta', 'info');
         }
 
         function initGamificacaoScripts() {
             // Scripts específicos da gamificação
-            console.log('Gamificação scripts initialized');
+            showNotification('Gamificação pronta', 'info');
         }
 
         function initCrmCharts() {
@@ -2793,44 +2821,44 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         function initAdminScripts() {
             // Scripts específicos do admin
-            console.log('Admin scripts initialized');
+            showNotification('Admin pronto', 'info');
         }
 
         // Funções auxiliares para módulos específicos
         function openModule(moduleId) {
             // Abrir modal do módulo
-            console.log('Opening module:', moduleId);
+            showNotification('Abrindo módulo: ' + moduleId, 'info');
             // Implementar lógica de abertura do módulo
         }
 
         function openModal(modalId) {
             // Abrir modal específico
-            console.log('Opening modal:', modalId);
+            showNotification('Abrindo modal: ' + modalId, 'info');
             // Implementar lógica de abertura do modal
         }
 
         function openProcedure(procedureId) {
             // Abrir procedimento específico
-            console.log('Opening procedure:', procedureId);
+            showNotification('Abrindo procedimento: ' + procedureId, 'info');
             // Implementar lógica de abertura do procedimento
         }
 
         function loadAdminSection(section) {
             // Carregar seção específica do admin
-            console.log('Loading admin section:', section);
+            showNotification('Carregando seção: ' + section, 'info');
             // Implementar lógica de carregamento da seção
         }
 
         // Inicialização da aplicação
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Plataforma Embalagens Conceito iniciada');
+            showNotification('Aplicação iniciada', 'success');
             
             // Verificar se há usuário logado
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    console.log('Usuário logado:', user.email);
+                    showNotification('Usuário logado: ' + user.email, 'success');
                 } else {
-                    console.log('Usuário não logado');
+                    showNotification('Usuário não logado', 'info');
                 }
             });
         });
@@ -2848,8 +2876,33 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         }
 
         function showNotification(message, type = 'info') {
-            // Implementar sistema de notificações
-            console.log(`Notification [${type}]:`, message);
+            let container = document.getElementById('notification-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notification-container';
+                document.body.appendChild(container);
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            container.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('hide');
+                notification.addEventListener('transitionend', () => notification.remove());
+            }, 4000);
+
+            if ('Notification' in window && Notification.permission === 'granted') {
+                navigator.serviceWorker.getRegistration().then(reg => {
+                    if (reg) {
+                        reg.showNotification('Plataforma Embalagens Conceito', {
+                            body: message,
+                            icon: '/icon-192x192.png'
+                        });
+                    }
+                });
+            }
         }
 
         // Funções de gamificação
@@ -3093,10 +3146,10 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
                     .then((registration) => {
-                        console.log('SW registered: ', registration);
+                        showNotification('PWA ativo', 'success');
                     })
                     .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
+                        showNotification('Falha ao registrar service worker', 'error');
                     });
             });
         }
@@ -3133,7 +3186,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Sincronizar dados quando voltar online
         function syncOfflineData() {
             // Implementar sincronização de dados offline
-            console.log('Sincronizando dados offline...');
+            showNotification('Sincronizando dados offline...', 'info');
         }
 
         // Configurações de tema
@@ -3164,7 +3217,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Função para busca global
         function globalSearch(query) {
             // Implementar busca global na plataforma
-            console.log('Searching for:', query);
+            showNotification('Buscando por: ' + query, 'info');
         }
 
         // Event listeners para busca
@@ -3218,7 +3271,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Função para analytics
         function trackEvent(eventName, properties = {}) {
             // Implementar tracking de eventos
-            console.log('Event tracked:', eventName, properties);
+            showNotification('Evento: ' + eventName, 'info');
             
             // Salvar no Firebase Analytics (se configurado)
             if (typeof gtag !== 'undefined') {
@@ -3247,8 +3300,8 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Inicializar otimizações de performance
         document.addEventListener('DOMContentLoaded', optimizePerformance);
 
-        console.log('Plataforma Embalagens Conceito - Versão 1.0.0');
-        console.log('Desenvolvida com ❤️ para a equipe de vendas');
+        showNotification('Plataforma Embalagens Conceito - Versão 1.0.0', 'info');
+        showNotification('Desenvolvida com ❤️ para a equipe de vendas', 'info');
     </script>
 </body>
 </html>
