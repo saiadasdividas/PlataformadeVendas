@@ -961,9 +961,15 @@
         async function loadUserData() {
             try {
                 const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                const roleDoc = await db.collection('roles').doc(currentUser.uid).get();
                 if (userDoc.exists) {
                     const userData = userDoc.data();
-                    userRole = userData.profile?.role || 'USER';
+                    if (roleDoc.exists) {
+                        userRole = roleDoc.data().role;
+                    } else {
+                        userRole = userData.profile?.role || 'USER';
+                        await db.collection('roles').doc(currentUser.uid).set({ role: userRole });
+                    }
                     
                     // Atualizar UI com dados do usuário
                     document.getElementById('userName').textContent = userData.profile?.name || currentUser.email;
@@ -1001,8 +1007,9 @@
                     achievements: []
                 }
             };
-            
+
             await db.collection('users').doc(currentUser.uid).set(defaultProfile);
+            await db.collection('roles').doc(currentUser.uid).set({ role: 'USER' });
             userRole = 'USER';
         }
 
@@ -2619,6 +2626,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                         </div>
                     </div>
                 </div>
+                <div id="adminSectionContainer"></div>
             `;
         }
 
@@ -2792,8 +2800,51 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         }
 
         function initAdminScripts() {
-            // Scripts específicos do admin
             console.log('Admin scripts initialized');
+        }
+
+        async function loadAllUsers() {
+            const snapshot = await db.collection('users').get();
+            const users = [];
+            for (const doc of snapshot.docs) {
+                const data = doc.data();
+                const roleDoc = await db.collection('roles').doc(doc.id).get();
+                const role = roleDoc.exists ? roleDoc.data().role : (data.profile?.role || 'USER');
+                users.push({
+                    id: doc.id,
+                    name: data.profile?.name || data.profile?.email || '',
+                    email: data.profile?.email || '',
+                    role
+                });
+            }
+            renderUsersTable(users);
+        }
+
+        function renderUsersTable(users) {
+            const roles = ['USER','ADMIN_OPERACIONAL','ADMIN_CONTEUDO','ADMIN_GAMIFICACAO','SUPER_ADMIN'];
+            let html = '<table class="user-table" style="width:100%;border-collapse:collapse;">';
+            html += '<thead><tr><th>Nome</th><th>Email</th><th>Permissão</th></tr></thead><tbody>';
+            users.forEach(u => {
+                html += `<tr><td>${u.name}</td><td>${u.email}</td><td><select data-uid="${u.id}" onchange="changeUserRole(this.dataset.uid,this.value)">` +
+                    roles.map(r => `<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('') +
+                    '</select></td></tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('adminSectionContainer').innerHTML = html;
+        }
+
+        async function changeUserRole(uid, role) {
+            try {
+                await db.collection('roles').doc(uid).set({ role });
+                await db.collection('users').doc(uid).update({ 'profile.role': role });
+                if (uid === currentUser.uid) {
+                    await loadUserData();
+                    loadPage(currentPage);
+                }
+                loadAllUsers();
+            } catch (error) {
+                console.error('Erro ao mudar papel do usuário:', error);
+            }
         }
 
         // Funções auxiliares para módulos específicos
@@ -2816,9 +2867,12 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         }
 
         function loadAdminSection(section) {
-            // Carregar seção específica do admin
             console.log('Loading admin section:', section);
-            // Implementar lógica de carregamento da seção
+            if (section === 'users') {
+                loadAllUsers();
+            } else {
+                document.getElementById('adminSectionContainer').innerHTML = '';
+            }
         }
 
         // Inicialização da aplicação
