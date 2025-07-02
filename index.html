@@ -853,6 +853,51 @@
         </div>
     </div>
 
+    <!-- Modals -->
+    <div id="addProspectModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Novo Prospect</h2>
+                <button class="close-btn" onclick="closeModal('addProspectModal')">&times;</button>
+            </div>
+            <form id="addProspectForm">
+                <div class="form-group">
+                    <label class="form-label">Nome</label>
+                    <input type="text" id="prospectName" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Empresa</label>
+                    <input type="text" id="prospectCompany" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="prospectEmail" class="input" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addModuleModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Novo Módulo</h2>
+                <button class="close-btn" onclick="closeModal('addModuleModal')">&times;</button>
+            </div>
+            <form id="addModuleForm">
+                <div class="form-group">
+                    <label class="form-label">Título</label>
+                    <input type="text" id="moduleTitle" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <textarea id="moduleDescription" class="input" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Configuração do Firebase em arquivo externo config.js
 
@@ -1222,7 +1267,7 @@
                         <h1 class="module-title">Academia de Treinamentos</h1>
                         <p class="module-subtitle">Desenvolva suas habilidades com nossos módulos especializados</p>
                     </div>
-                    <button class="btn btn-primary">
+                    <button class="btn btn-primary" onclick="openModal('addModuleModal')">
                         <i class="fas fa-plus"></i>
                         Novo Módulo
                     </button>
@@ -1236,61 +1281,7 @@
                         </h2>
                         <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Sales Development Representatives</p>
                         
-                        <div class="modules-list">
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('sdr-1')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--success); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">1. Identificação de Oportunidades</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Como identificar e qualificar oportunidades de negócio</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge badge-success">Concluído</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+50 pontos</span>
-                                    </div>
-                                </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--success);">100%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Completo</div>
-                                </div>
-                            </div>
-
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('sdr-2')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
-                                    <i class="fas fa-play"></i>
-                                </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">2. Perfil do Cliente Ideal</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Definindo e identificando seu ICP (Ideal Customer Profile)</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge badge-primary">Em Progresso</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+75 pontos</span>
-                                    </div>
-                                </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--primary);">65%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Em andamento</div>
-                                </div>
-                            </div>
-
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('sdr-3')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-light); margin-right: 16px;">
-                                    <i class="fas fa-lock"></i>
-                                </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">3. Técnicas de Qualificação BANT</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Budget, Authority, Need, Timeline - Qualificação eficaz</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge" style="background: #f1f5f9; color: var(--text-light);">Bloqueado</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+100 pontos</span>
-                                    </div>
-                                </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Bloqueado</div>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="trainingModules" class="modules-list"></div>
                     </div>
 
                     <div class="card section-card">
@@ -1773,86 +1764,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 12px;">
-                                            <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">JS</div>
-                                            <div>
-                                                <div style="font-weight: 600;">João Silva</div>
-                                                <div style="font-size: 12px; color: var(--text-light);">joao@empresa.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Empresa ABC Ltda</td>
-                                    <td><span class="badge badge-success">Qualificado</span></td>
-                                    <td>R$ 15.000</td>
-                                    <td>Hoje, 14:30</td>
-                                    <td>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 8px;">
-                                            <i class="fas fa-phone"></i>
-                                        </button>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 8px;">
-                                            <i class="fas fa-envelope"></i>
-                                        </button>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 12px;">
-                                            <div style="width: 40px; height: 40px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">MS</div>
-                                            <div>
-                                                <div style="font-weight: 600;">Maria Santos</div>
-                                                <div style="font-size: 12px; color: var(--text-light);">maria@startup.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Startup XYZ</td>
-                                    <td><span class="badge badge-warning">Proposta</span></td>
-                                    <td>R$ 8.500</td>
-                                    <td>Ontem, 16:45</td>
-                                    <td>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 8px;">
-                                            <i class="fas fa-phone"></i>
-                                        </button>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 8px;">
-                                            <i class="fas fa-envelope"></i>
-                                        </button>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div style="display: flex; align-items: center; gap: 12px;">
-                                            <div style="width: 40px; height: 40px; background: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">CO</div>
-                                            <div>
-                                                <div style="font-weight: 600;">Carlos Oliveira</div>
-                                                <div style="font-size: 12px; color: var(--text-light);">carlos@tech.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>Tech Solutions</td>
-                                    <td><span class="badge badge-primary">Contactado</span></td>
-                                    <td>R$ 22.000</td>
-                                    <td>2 dias atrás</td>
-                                    <td>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 8px;">
-                                            <i class="fas fa-phone"></i>
-                                        </button>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-right: 8px;">
-                                            <i class="fas fa-envelope"></i>
-                                        </button>
-                                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="prospectRows"></tbody>
                         </table>
                     </div>
                 </div>
@@ -2723,6 +2635,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         function initAcademiaScripts() {
             // Scripts específicos da academia
             showNotification('Academia pronta', 'info');
+            loadTrainingModules();
         }
 
         function initGamificacaoScripts() {
@@ -2762,6 +2675,8 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                     }
                 });
             }
+
+            loadProspects();
         }
 
         function initMrRepresentacoesCharts() {
@@ -2835,16 +2750,69 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         }
 
         // Funções auxiliares para módulos específicos
-        function openModule(moduleId) {
+       function openModule(moduleId) {
             // Abrir modal do módulo
             showNotification('Abrindo módulo: ' + moduleId, 'info');
             // Implementar lógica de abertura do módulo
         }
 
         function openModal(modalId) {
-            // Abrir modal específico
-            showNotification('Abrindo modal: ' + modalId, 'info');
-            // Implementar lógica de abertura do modal
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function loadProspects() {
+            const tbody = document.getElementById('prospectRows');
+            if (!tbody) return;
+            db.collection('prospects').orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    tbody.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const p = doc.data();
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${p.name}</td>
+                            <td>${p.company || ''}</td>
+                            <td><span class="badge badge-primary">${p.status || 'Novo'}</span></td>
+                            <td>${p.value ? formatCurrency(p.value) : '-'}</td>
+                            <td>${p.lastContact ? formatDate(p.lastContact.toDate()) : '-'}</td>
+                            <td><button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;"><i class="fas fa-edit"></i></button></td>`;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        function loadTrainingModules() {
+            const container = document.getElementById('trainingModules');
+            if (!container) return;
+            db.collection('trainingModules').orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    container.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const m = doc.data();
+                        const div = document.createElement('div');
+                        div.className = 'module-item';
+                        div.style.cssText = 'display:flex;align-items:center;padding:16px;margin-bottom:12px;border:1px solid var(--border);border-radius:12px;';
+                        div.innerHTML = `
+                            <div class="module-icon" style="width:50px;height:50px;background:var(--primary);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;margin-right:16px;">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <div class="module-content" style="flex:1;">
+                                <h4 style="font-weight:600;margin-bottom:4px;">${m.title}</h4>
+                                <p style="font-size:14px;color:var(--text-light);margin-bottom:8px;">${m.description}</p>
+                            </div>`;
+                        container.appendChild(div);
+                    });
+                });
         }
 
         function openProcedure(procedureId) {
@@ -2862,7 +2830,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Inicialização da aplicação
         document.addEventListener('DOMContentLoaded', () => {
             showNotification('Aplicação iniciada', 'success');
-            
+
             // Verificar se há usuário logado
             auth.onAuthStateChanged((user) => {
                 if (user) {
@@ -2871,6 +2839,36 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                     showNotification('Usuário não logado', 'info');
                 }
             });
+
+            const prospectForm = document.getElementById('addProspectForm');
+            if (prospectForm) {
+                prospectForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await db.collection('prospects').add({
+                        name: document.getElementById('prospectName').value,
+                        company: document.getElementById('prospectCompany').value,
+                        email: document.getElementById('prospectEmail').value,
+                        status: 'Novo',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    prospectForm.reset();
+                    closeModal('addProspectModal');
+                });
+            }
+
+            const moduleForm = document.getElementById('addModuleForm');
+            if (moduleForm) {
+                moduleForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await db.collection('trainingModules').add({
+                        title: document.getElementById('moduleTitle').value,
+                        description: document.getElementById('moduleDescription').value,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    moduleForm.reset();
+                    closeModal('addModuleModal');
+                });
+            }
         });
 
         // Funções de utilidade
