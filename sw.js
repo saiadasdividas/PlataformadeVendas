@@ -2,12 +2,12 @@ const CACHE_NAME = 'plataforma-embalagens-v1.0.0';
 const urlsToCache = [
   '/',
   '/index.html',
-  'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js',
-  'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js',
-  'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js',
-  'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js',
+  '/vendor/firebase/firebase-app-compat.js',
+  '/vendor/firebase/firebase-auth-compat.js',
+  '/vendor/firebase/firebase-firestore-compat.js',
+  '/vendor/firebase/firebase-storage-compat.js',
   'https://cdn.jsdelivr.net/npm/chart.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  '/vendor/fontawesome/css/all.min.css'
 ];
 
 self.addEventListener('install', (event) => {
