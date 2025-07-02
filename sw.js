@@ -14,7 +14,10 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Cache aberto');
+        self.registration.showNotification('Cache aberto', {
+          body: 'Recursos prontos para uso',
+          icon: '/icon-192x192.png'
+        });
         return cache.addAll(urlsToCache);
       })
   );
@@ -40,7 +43,10 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Removendo cache antigo:', cacheName);
+            self.registration.showNotification('Limpando cache antigo', {
+              body: cacheName,
+              icon: '/icon-192x192.png'
+            });
             return caches.delete(cacheName);
           }
         })
@@ -108,7 +114,10 @@ self.addEventListener('sync', (event) => {
 
 function doBackgroundSync() {
   // Implementar sincronização de dados em background
-  console.log('Executando sincronização em background');
+  self.registration.showNotification('Sincronização em background', {
+    body: 'Dados sendo sincronizados',
+    icon: '/icon-192x192.png'
+  });
   return Promise.resolve();
 }
 
@@ -122,7 +131,10 @@ self.addEventListener('share', (event) => {
 
 function handleSharedData(data) {
   // Implementar processamento de dados compartilhados
-  console.log('Dados compartilhados:', data);
+  self.registration.showNotification('Dados compartilhados', {
+    body: JSON.stringify(data),
+    icon: '/icon-192x192.png'
+  });
   return Promise.resolve();
 }
 
