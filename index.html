@@ -900,6 +900,11 @@
 
     <script>
         // Configuração do Firebase em arquivo externo config.js
+        if (typeof firebaseConfig === 'undefined') {
+            document.body.innerHTML =
+                '<h2 style="padding:20px;text-align:center">Arquivo config.js n\u00e3o encontrado.\nVerifique se o arquivo est\u00e1 na raiz do projeto e cont\u00e9m suas credenciais.</h2>';
+            throw new Error('config.js n\u00e3o encontrado');
+        }
 
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
