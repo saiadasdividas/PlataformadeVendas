@@ -1001,9 +1001,23 @@
                     achievements: []
                 }
             };
-            
+
             await db.collection('users').doc(currentUser.uid).set(defaultProfile);
             userRole = 'USER';
+        }
+
+        async function updateUserProfile(uid, profileData) {
+            const isAdmin = ['SUPER_ADMIN', 'ADMIN_OPERACIONAL', 'ADMIN_CONTEUDO', 'ADMIN_GAMIFICACAO'].includes(userRole);
+            if (uid !== currentUser.uid && !isAdmin) {
+                throw new Error('Permissão negada');
+            }
+
+            await db.collection('users').doc(uid).update({
+                profile: {
+                    ...profileData,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }
+            });
         }
 
         function loadPage(page) {
@@ -2158,16 +2172,18 @@
         }
 
         function getPerfilContent() {
+            const isAdmin = ['SUPER_ADMIN', 'ADMIN_OPERACIONAL', 'ADMIN_CONTEUDO', 'ADMIN_GAMIFICACAO'].includes(userRole);
             return `
                 <div class="module-header">
                     <div>
                         <h1 class="module-title">Meu Perfil</h1>
                         <p class="module-subtitle">Gerencie suas informações pessoais e configurações</p>
                     </div>
+                    ${isAdmin ? `
                     <button class="btn btn-primary">
                         <i class="fas fa-edit"></i>
                         Editar Perfil
-                    </button>
+                    </button>` : ''}
                 </div>
 
                 <div class="dashboard-grid">
