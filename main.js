@@ -1,7 +1,6 @@
         // Configuração do Firebase em arquivo externo config.js
 
         // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         const storage = firebase.storage();
@@ -1887,6 +1886,9 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                             <td><button class="btn btn-secondary" style="padding:6px 12px;font-size:12px;"><i class="fas fa-edit"></i></button></td>`;
                         tbody.appendChild(tr);
                     });
+                }, err => {
+                    console.error('Erro ao carregar prospects:', err);
+                    showNotification('Erro ao carregar prospects', 'error');
                 });
         }
 
@@ -1911,6 +1913,9 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                             </div>`;
                         container.appendChild(div);
                     });
+                }, err => {
+                    console.error('Erro ao carregar módulos:', err);
+                    showNotification('Erro ao carregar módulos', 'error');
                 });
         }
 
@@ -2198,6 +2203,8 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                             showNotification(notification.message, notification.type);
                         }
                     });
+                }, err => {
+                    console.error('Erro em notificações em tempo real:', err);
                 });
         }
 
