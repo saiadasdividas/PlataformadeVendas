@@ -90,7 +90,7 @@ auth.onAuthStateChanged(async (user) => {
         userRole = idTokenResult.claims.role || 'USER';
         currentUser = user;
 
-        await loadUserData();    // já existente: carrega dados do Firestore
+        await loadUserData();    // carrega dados do Firestore
         renderMenuForRole(userRole); // monta o menu de acordo com a role
         showMainApp();
         loadPage(currentPage);
@@ -2130,14 +2130,6 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         document.addEventListener('DOMContentLoaded', () => {
             showNotification('Aplicação iniciada', 'success');
 
-            // Verificar se há usuário logado
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    showNotification('Usuário logado: ' + user.email, 'success');
-                } else {
-                    showNotification('Usuário não logado', 'info');
-                }
-            });
 
             const prospectForm = document.getElementById('addProspectForm');
             if (prospectForm) {
