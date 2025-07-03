@@ -4,13 +4,11 @@
   "description": "PWA Plataforma de Vendas com Firebase",
   "main": "index.js",
   "scripts": {
-    "setup": "npm install",
-    "test": "jest",
-    "pretest": "npm install"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "jest": "^29.6.0"
+    "jest": "^29.7.0"
   }
 }

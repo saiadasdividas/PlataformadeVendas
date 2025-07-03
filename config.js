@@ -1,4 +1,5 @@
-// config.js — Firebase configuration
+// config.js
+// === Firebase configuration ===
 const firebaseConfig = {
   apiKey: "AIzaSyDgg5jnDEypyXsAxgqFHDZQzK3rpLY3nU8",
   authDomain: "plataforma-de-vendas-a87c2.firebaseapp.com",
