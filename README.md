@@ -2,6 +2,15 @@
 
 Plataforma Embalagens Conceito é uma Progressive Web App que integra treinamento, CRM e gamificação para a equipe de vendas. A aplicação utiliza Firebase Authentication, Firestore e Storage, além de recursos de PWA para funcionamento offline e notificações.
 
+## Setup do Projeto
+1. Clone o repositório
+2. Execute `npm install` para instalar as dependências
+3. Execute `npm test` para rodar os testes
+
+### Para GitHub Codex
+Se estiver usando o GitHub Codex, execute primeiro:
+```bash
+npm install
 ## Recursos principais
 - Autenticação de usuários e gerenciamento de perfis
 - Dashboard com módulos de treinamento (Academia)
