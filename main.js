@@ -47,6 +47,10 @@ function renderMenuForRole(role) {
         return;
     }
 
+    // Limpa itens existentes para evitar duplicações quando a função é chamada
+    // múltiplas vezes (ex.: após novo login ou atualização de permissões)
+    menu.innerHTML = '';
+
     (navConfig[role] || navConfig.USER).forEach(page => {
         const conf = meta[page];
         if (!conf) return;
