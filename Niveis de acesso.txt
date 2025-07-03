@@ -1,0 +1,9 @@
+Role	Abas visíveis
+SUPER_ADMIN	 - dashboard, academia, gamificação, CRM & Vendas, MR Representações, perfil, admin
+ADMIN_OPERACIONAL	- dashboard, academia, gamificação, CRM & Vendas, perfil, admin
+ADMIN_CONTEUDO	- dashboard, academia, perfil, admin
+ADMIN_GAMIFICACAO	- dashboard, academia, gamificação, perfil, admin
+USER_SDR	- dashboard, academia, CRM & Vendas, perfil
+USER_VENDEDOR	- dashboard, CRM & Vendas, perfil
+MR_RESPONSAVEL	- dashboard, academia, perfil
+USER (default)	- dashboard, perfil

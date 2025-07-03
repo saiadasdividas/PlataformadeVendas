@@ -1,0 +1,14 @@
+{
+  "name": "plataforma-de-vendas",
+  "version": "1.0.0",
+  "description": "PWA Plataforma de Vendas com Firebase",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
