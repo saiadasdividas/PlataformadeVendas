@@ -6,9 +6,16 @@
         const storage = firebase.storage();
 
         // Estado da aplicação
+        const adminRoles = ['SUPER_ADMIN', 'ADMIN_OPERACIONAL', 'ADMIN_CONTEUDO', 'ADMIN_GAMIFICACAO'];
+        const mrRoles = ['MR_RESPONSAVEL'];
+
         let currentUser = null;
         let userRole = null;
         let currentPage = 'dashboard';
+
+        function isAdmin() {
+            return adminRoles.includes(userRole);
+        }
 
         // Elementos DOM
         const loginPage = document.getElementById('loginPage');
@@ -111,6 +118,32 @@
             loginAlert.classList.add('hidden');
         }
 
+        function configureMenu() {
+            const adminNav = document.getElementById('adminNav');
+            if (isAdmin()) {
+                adminNav.style.display = 'flex';
+            } else {
+                adminNav.style.display = 'none';
+            }
+
+            const mrNav = document.querySelector('[data-page="mr-representacoes"]');
+            const crmNav = document.querySelector('[data-page="crm"]');
+            const gamNav = document.querySelector('[data-page="gamificacao"]');
+            const dashNav = document.querySelector('[data-page="dashboard"]');
+            const academiaNav = document.querySelector('[data-page="academia"]');
+            const perfilNav = document.querySelector('[data-page="perfil"]');
+
+            if (mrRoles.includes(userRole)) {
+                // mostra apenas estas abas
+                [crmNav, adminNav, mrNav].forEach(el => { if(el) el.style.display = 'none'; });
+                [gamNav, dashNav, academiaNav, perfilNav].forEach(el => { if(el) el.style.display = 'flex'; });
+                mrNav.style.display = 'flex';
+            } else {
+                // padrão
+                [crmNav, gamNav, dashNav, academiaNav, perfilNav, mrNav].forEach(el => { if(el) el.style.display = 'flex'; });
+            }
+        }
+
         function navigateTo(page) {
             currentPage = page;
             
@@ -135,13 +168,7 @@
                     document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
                     document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
                     
-                    // Mostrar/ocultar menu admin
-                    const adminNav = document.getElementById('adminNav');
-                    if (['SUPER_ADMIN', 'ADMIN_OPERACIONAL', 'ADMIN_CONTEUDO', 'ADMIN_GAMIFICACAO'].includes(userRole)) {
-                        adminNav.style.display = 'flex';
-                    } else {
-                        adminNav.style.display = 'none';
-                    }
+                    configureMenu();
                 } else {
                     // Criar perfil padrão se não existir
                     await createDefaultUserProfile();
@@ -172,8 +199,7 @@
         }
 
         async function updateUserProfile(uid, profileData) {
-            const isAdmin = ['SUPER_ADMIN', 'ADMIN_OPERACIONAL', 'ADMIN_CONTEUDO', 'ADMIN_GAMIFICACAO'].includes(userRole);
-            if (uid !== currentUser.uid && !isAdmin) {
+            if (!isAdmin()) {
                 throw new Error('Permissão negada');
             }
 
@@ -229,6 +255,11 @@
         }
 
         function getDashboardContent() {
+            if (isAdmin()) return getAdminDashboard();
+            return getUserDashboard();
+        }
+
+        function getUserDashboard() {
             return `
                 <div class="dashboard-grid">
                     <div class="card stat-card">
@@ -358,6 +389,10 @@
             `;
         }
 
+        function getAdminDashboard() {
+            return getUserDashboard();
+        }
+
         function getAcademiaContent() {
             return `
                 <div class="module-header">
@@ -365,10 +400,11 @@
                         <h1 class="module-title">Academia de Treinamentos</h1>
                         <p class="module-subtitle">Desenvolva suas habilidades com nossos módulos especializados</p>
                     </div>
+                    ${isAdmin() ? `
                     <button class="btn btn-primary" onclick="openModal('addModuleModal')">
                         <i class="fas fa-plus"></i>
                         Novo Módulo
-                    </button>
+                    </button>` : ''}
                 </div>
 
                 <div class="dashboard-grid">
@@ -456,6 +492,18 @@
                             <p style="font-size: 14px; color: var(--text-light);">18 templates disponíveis</p>
                         </div>
                     </div>
+                </div>
+
+                <div class="card section-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-comment"></i>
+                        Envie seu Feedback
+                    </h2>
+                    <form id="feedbackForm">
+                        <textarea id="feedbackText" class="input" placeholder="Escreva aqui" required style="margin-bottom:12px;"></textarea>
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                    </form>
+                    <div id="myFeedbacks" style="margin-top:16px;"></div>
                 </div>
             `;
         }
@@ -1919,6 +1967,24 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                 });
         }
 
+        function loadUserFeedbacks() {
+            const container = document.getElementById('myFeedbacks');
+            if (!container || !currentUser) return;
+            db.collection('feedback')
+                .where('userId', '==', currentUser.uid)
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    container.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const d = doc.data();
+                        const div = document.createElement('div');
+                        div.className = 'feedback-item';
+                        div.textContent = d.text;
+                        container.appendChild(div);
+                    });
+                });
+        }
+
         function openProcedure(procedureId) {
             // Abrir procedimento específico
             showNotification('Abrindo procedimento: ' + procedureId, 'info');
@@ -1972,6 +2038,22 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                     moduleForm.reset();
                     closeModal('addModuleModal');
                 });
+            }
+
+            const feedbackForm = document.getElementById('feedbackForm');
+            if (feedbackForm) {
+                feedbackForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await db.collection('feedback').add({
+                        userId: currentUser.uid,
+                        text: document.getElementById('feedbackText').value,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    feedbackForm.reset();
+                    loadUserFeedbacks();
+                    showNotification('Feedback enviado', 'success');
+                });
+                loadUserFeedbacks();
             }
         });
 
