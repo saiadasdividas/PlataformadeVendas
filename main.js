@@ -1,4 +1,3 @@
- <script>
         // Configuração do Firebase em arquivo externo config.js
 
         // Inicializar Firebase
@@ -2524,4 +2523,4 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         showNotification('Plataforma Embalagens Conceito - Versão 1.0.0', 'info');
         showNotification('Desenvolvida com ❤️ para a equipe de vendas', 'info');
-    </script>
+    
