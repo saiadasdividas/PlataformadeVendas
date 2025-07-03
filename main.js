@@ -297,7 +297,7 @@ function loadAdmin() {
                     document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
                     document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
                     
-                    configureMenu(); // ← REMOVER ESTA LINHA
+
                 } else {
                     // Criar perfil padrão se não existir
                     await createDefaultUserProfile();
@@ -2394,22 +2394,22 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         // Sistema de notificações em tempo real
         function initRealtimeNotifications() {
-            if (!currentUser) return;
-            
-            db.collection('notifications')
-                .where('userId', '==', currentUser.uid)
-                .where('read', '==', false)
-                .onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === 'added') {
-                            const notification = change.doc.data();
-                            showNotification(notification.message, notification.type);
-                        }
-                    });
-                }, err => {
-                    console.error('Erro em notificações em tempo real:', err);
-                });
-        }
+  if (!currentUser) return;
+
+  try {
+    db.collection('notifications')
+      .where('userId', '==', currentUser.uid)
+      .where('read', '==', false)
+      .onSnapshot(snapshot => {
+        // … seu código de notificação …
+      });
+  } catch (err) {
+    console.warn(
+      'Não foi possível iniciar notificações em tempo real:',
+      err.message
+    );
+  }
+}
 
         // Inicializar notificações em tempo real quando o usuário fizer login
         auth.onAuthStateChanged((user) => {
