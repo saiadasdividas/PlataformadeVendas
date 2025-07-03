@@ -23,8 +23,8 @@ const navConfig = {
     ADMIN_OPERACIONAL: ['dashboard','academia','gamificacao','crm','perfil','admin'],
     ADMIN_CONTEUDO: ['dashboard','academia','perfil','admin'],
     ADMIN_GAMIFICACAO: ['dashboard','academia','gamificacao','perfil','admin'],
-    USER_SDR: ['dashboard','academia','crm','perfil'],
-    USER_VENDEDOR: ['dashboard','crm','perfil'],
+    USER_SDR: ['dashboard','academia','crm','perfil','gamificacao'],
+    USER_VENDEDOR: ['dashboard','crm','perfil','gamificacao'],
     MR_RESPONSAVEL: ['dashboard','academia','perfil'],
     USER: ['dashboard','perfil']
 };
