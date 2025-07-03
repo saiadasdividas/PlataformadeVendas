@@ -1,160 +1,286 @@
         // Configuração do Firebase em arquivo externo config.js
 
-        // Inicializar Firebase
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+// Inicializar Firebase
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-        // Estado da aplicação
-        const adminRoles = ['SUPER_ADMIN', 'ADMIN_OPERACIONAL', 'ADMIN_CONTEUDO', 'ADMIN_GAMIFICACAO'];
-        const mrRoles = ['MR_RESPONSAVEL'];
+// Estado da aplicação
+const adminRoles = ['SUPER_ADMIN', 'ADMIN_OPERACIONAL', 'ADMIN_CONTEUDO', 'ADMIN_GAMIFICACAO'];
+const mrRoles = ['MR_RESPONSAVEL'];
 
-        let currentUser = null;
-        let userRole = null;
-        let currentPage = 'dashboard';
+let currentUser = null;
+let userRole = null;
+let currentPage = 'dashboard';
 
-        function isAdmin() {
-            return adminRoles.includes(userRole);
-        }
+function isAdmin() {
+    return adminRoles.includes(userRole);
+}
 
-        // Elementos DOM
-        const loginPage = document.getElementById('loginPage');
-        const mainApp = document.getElementById('mainApp');
-        const loginForm = document.getElementById('loginForm');
-        const loginAlert = document.getElementById('loginAlert');
-        const contentArea = document.getElementById('contentArea');
-        const pageTitle = document.getElementById('pageTitle');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
+// 1. Mapeamento de quais abas cada role vê
+const navConfig = {
+    SUPER_ADMIN: ['dashboard','academia','gamificacao','crm','mr-representacoes','perfil','admin'],
+    ADMIN_OPERACIONAL: ['dashboard','academia','gamificacao','crm','perfil','admin'],
+    ADMIN_CONTEUDO: ['dashboard','academia','perfil','admin'],
+    ADMIN_GAMIFICACAO: ['dashboard','academia','gamificacao','perfil','admin'],
+    USER_SDR: ['dashboard','academia','crm','perfil'],
+    USER_VENDEDOR: ['dashboard','crm','perfil'],
+    MR_RESPONSAVEL: ['dashboard','academia','perfil'],
+    USER: ['dashboard','perfil']
+};
 
-        // Autenticação
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                await loadUserData();
-                showMainApp();
-                loadPage(currentPage);
-            } else {
-                showLoginPage();
-            }
-        });
+// 2. Função que gera o menu no DOM
+function renderMenuForRole(role) {
+    const meta = {
+        dashboard: { icon: 'fas fa-home', label: 'Dashboard' },
+        academia: { icon: 'fas fa-graduation-cap', label: 'Academia' },
+        gamificacao: { icon: 'fas fa-gamepad', label: 'Gamificação' },
+        crm: { icon: 'fas fa-briefcase', label: 'CRM & Vendas' },
+        'mr-representacoes': { icon: 'fas fa-user-tie', label: 'MR Representações' },
+        perfil: { icon: 'fas fa-user', label: 'Perfil' },
+        admin: { icon: 'fas fa-cog', label: 'Admin' }
+    };
 
-        // Login
-        loginForm.addEventListener('submit', async (e) => {
+    const menu = document.getElementById('navMenu');
+    menu.innerHTML = '';
+
+    (navConfig[role] || navConfig.USER).forEach(page => {
+        const conf = meta[page];
+        if (!conf) return;
+
+        const a = document.createElement('a');
+        a.href = '#';
+        a.className = 'nav-item';
+        a.dataset.page = page;
+        a.innerHTML = `<i class="${conf.icon}"></i><span>${conf.label}</span>`;
+        
+        a.addEventListener('click', e => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            showLoading(true);
-            hideAlert();
-            
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch (error) {
-                showAlert('Erro ao fazer login: ' + error.message, 'error');
-                showLoading(false);
-            }
+            navigateTo(page);
         });
+        
+        menu.appendChild(a);
+    });
+}
 
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await auth.signOut();
-        });
+// Elementos DOM
+const loginPage = document.getElementById('loginPage');
+const mainApp = document.getElementById('mainApp');
+const loginForm = document.getElementById('loginForm');
+const loginAlert = document.getElementById('loginAlert');
+const contentArea = document.getElementById('contentArea');
+const pageTitle = document.getElementById('pageTitle');
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
 
-        // Navegação
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                const page = item.dataset.page;
-                if (page) {
-                    navigateTo(page);
-                }
-            });
-        });
+// 3. Único onAuthStateChanged, já capturando claims e montando menu
+auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+        showLoginPage();
+        return;
+    }
 
-        // Toggle Sidebar
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            const icon = sidebarToggle.querySelector('i');
-            if (sidebar.classList.contains('collapsed')) {
-                icon.className = 'fas fa-chevron-right';
-                document.getElementById('logoText').style.display = 'none';
-            } else {
-                icon.className = 'fas fa-chevron-left';
-                document.getElementById('logoText').style.display = 'block';
-            }
-        });
+    try {
+        // Pega o token completo, incluindo claims customizadas
+        const idTokenResult = await user.getIdTokenResult();
+        // Extrair o role
+        userRole = idTokenResult.claims.role || 'USER';
+        currentUser = user;
 
-        // Funções auxiliares
-        function showLoginPage() {
-            loginPage.classList.remove('hidden');
-            mainApp.classList.add('hidden');
+        await loadUserData();    // já existente: carrega dados do Firestore
+        renderMenuForRole(userRole); // monta o menu de acordo com a role
+        showMainApp();
+        loadPage(currentPage);
+    } catch (error) {
+        console.error('Erro ao processar usuário:', error);
+        showLoginPage();
+    }
+});
+
+// Login
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    showLoading(true);
+    hideAlert();
+    
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+    } catch (error) {
+        showAlert('Erro ao fazer login: ' + error.message, 'error');
+        showLoading(false);
+    }
+});
+
+// Logout
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await auth.signOut();
+});
+
+// Toggle Sidebar
+sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    const icon = sidebarToggle.querySelector('i');
+    if (sidebar.classList.contains('collapsed')) {
+        icon.className = 'fas fa-chevron-right';
+        document.getElementById('logoText').style.display = 'none';
+    } else {
+        icon.className = 'fas fa-chevron-left';
+        document.getElementById('logoText').style.display = 'block';
+    }
+});
+
+// Funções auxiliares
+function showLoginPage() {
+    loginPage.classList.remove('hidden');
+    mainApp.classList.add('hidden');
+}
+
+function showMainApp() {
+    loginPage.classList.add('hidden');
+    mainApp.classList.remove('hidden');
+}
+
+function showLoading(show) {
+    const btnText = document.getElementById('loginBtnText');
+    const loading = document.getElementById('loginLoading');
+    if (show) {
+        btnText.style.display = 'none';
+        loading.classList.remove('hidden');
+    } else {
+        btnText.style.display = 'block';
+        loading.classList.add('hidden');
+    }
+}
+
+function showAlert(message, type = 'error') {
+    loginAlert.textContent = message;
+    loginAlert.className = `alert alert-${type}`;
+    loginAlert.classList.remove('hidden');
+}
+
+function hideAlert() {
+    loginAlert.classList.add('hidden');
+}
+
+function navigateTo(page) {
+    currentPage = page;
+    
+    // Atualizar navegação ativa
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    const activeNavItem = document.querySelector(`[data-page="${page}"]`);
+    if (activeNavItem) {
+        activeNavItem.classList.add('active');
+    }
+    
+    loadPage(page);
+}
+
+// Função loadUserData (adicione se não existir)
+async function loadUserData() {
+    try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            console.log('Dados do usuário carregados:', userData);
+            // Aqui você pode processar os dados do usuário conforme necessário
         }
+    } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+    }
+}
 
-        function showMainApp() {
-            loginPage.classList.add('hidden');
-            mainApp.classList.remove('hidden');
-        }
+// Função loadPage (adicione se não existir)
+function loadPage(page) {
+    console.log('Carregando página:', page);
+    
+    // Atualizar título da página
+    const pageTitle = document.getElementById('pageTitle');
+    if (pageTitle) {
+        pageTitle.textContent = page.charAt(0).toUpperCase() + page.slice(1);
+    }
+    
+    // Aqui você pode adicionar a lógica específica para carregar cada página
+    switch (page) {
+        case 'dashboard':
+            loadDashboard();
+            break;
+        case 'academia':
+            loadAcademia();
+            break;
+        case 'gamificacao':
+            loadGamificacao();
+            break;
+        case 'crm':
+            loadCRM();
+            break;
+        case 'mr-representacoes':
+            loadMRRepresentacoes();
+            break;
+        case 'perfil':
+            loadPerfil();
+            break;
+        case 'admin':
+            loadAdmin();
+            break;
+        default:
+            loadDashboard();
+    }
+}
 
-        function showLoading(show) {
-            const btnText = document.getElementById('loginBtnText');
-            const loading = document.getElementById('loginLoading');
-            if (show) {
-                btnText.style.display = 'none';
-                loading.classList.remove('hidden');
-            } else {
-                btnText.style.display = 'block';
-                loading.classList.add('hidden');
-            }
-        }
+// Placeholder functions para as páginas (substitua pela sua lógica real)
+function loadDashboard() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Dashboard</h2><p>Bem-vindo ao dashboard!</p>';
+    }
+}
 
-        function showAlert(message, type = 'error') {
-            loginAlert.textContent = message;
-            loginAlert.className = `alert alert-${type}`;
-            loginAlert.classList.remove('hidden');
-        }
+function loadAcademia() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Academia</h2><p>Área de treinamento e aprendizado.</p>';
+    }
+}
 
-        function hideAlert() {
-            loginAlert.classList.add('hidden');
-        }
+function loadGamificacao() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Gamificação</h2><p>Sistema de pontuação e recompensas.</p>';
+    }
+}
 
-        function configureMenu() {
-            const adminNav = document.getElementById('adminNav');
-            if (isAdmin()) {
-                adminNav.style.display = 'flex';
-            } else {
-                adminNav.style.display = 'none';
-            }
+function loadCRM() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>CRM & Vendas</h2><p>Gerenciamento de relacionamento com clientes.</p>';
+    }
+}
 
-            const mrNav = document.querySelector('[data-page="mr-representacoes"]');
-            const crmNav = document.querySelector('[data-page="crm"]');
-            const gamNav = document.querySelector('[data-page="gamificacao"]');
-            const dashNav = document.querySelector('[data-page="dashboard"]');
-            const academiaNav = document.querySelector('[data-page="academia"]');
-            const perfilNav = document.querySelector('[data-page="perfil"]');
+function loadMRRepresentacoes() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>MR Representações</h2><p>Área específica para representantes.</p>';
+    }
+}
 
-            if (mrRoles.includes(userRole)) {
-                // mostra apenas estas abas
-                [crmNav, adminNav, mrNav].forEach(el => { if(el) el.style.display = 'none'; });
-                [gamNav, dashNav, academiaNav, perfilNav].forEach(el => { if(el) el.style.display = 'flex'; });
-                mrNav.style.display = 'flex';
-            } else {
-                // padrão
-                [crmNav, gamNav, dashNav, academiaNav, perfilNav, mrNav].forEach(el => { if(el) el.style.display = 'flex'; });
-            }
-        }
+function loadPerfil() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Perfil</h2><p>Informações do seu perfil.</p>';
+    }
+}
 
-        function navigateTo(page) {
-            currentPage = page;
-            
-            // Atualizar navegação ativa
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            document.querySelector(`[data-page="${page}"]`).classList.add('active');
-            
-            loadPage(page);
-        }
+function loadAdmin() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Administração</h2><p>Área administrativa do sistema.</p>';
+    }
+}
 
         async function loadUserData() {
             try {
