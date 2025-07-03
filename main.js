@@ -42,7 +42,10 @@ function renderMenuForRole(role) {
     };
 
     const menu = document.getElementById('navMenu');
-    menu.innerHTML = '';
+    if (!menu) {
+        console.error('Elemento navMenu não encontrado no DOM');
+        return;
+    }
 
     (navConfig[role] || navConfig.USER).forEach(page => {
         const conf = meta[page];
@@ -294,7 +297,7 @@ function loadAdmin() {
                     document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
                     document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
                     
-                    configureMenu();
+                    configureMenu(); // ← REMOVER ESTA LINHA
                 } else {
                     // Criar perfil padrão se não existir
                     await createDefaultUserProfile();
