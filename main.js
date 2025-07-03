@@ -437,6 +437,17 @@ function loadAdmin() {
                     </div>
                 </div>
 
+                <form id="academia-form" style="margin:16px 0;">
+                    <input type="hidden" id="academia-id">
+                    <input id="academia-title" class="input" placeholder="Título" required>
+                    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
+                    <label style="display:block;margin:8px 0;">
+                        <input type="checkbox" id="academia-active"> Ativo
+                    </label>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </form>
+                <ul id="academia-list" class="modules-list"></ul>
+
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
@@ -1876,6 +1887,8 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                     initAdminScripts();
                     break;
             }
+
+            if (page === 'academia') initAcademiaModule();
         }
 
         function initDashboardCharts() {
@@ -2129,6 +2142,63 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
             // Carregar seção específica do admin
             showNotification('Carregando seção: ' + section, 'info');
             // Implementar lógica de carregamento da seção
+        }
+
+        async function initAcademiaModule() {
+            const form = document.getElementById('academia-form');
+            const list = document.getElementById('academia-list');
+            const col = db.collection('academyModules').orderBy('order');
+
+            // 1) Render em tempo real
+            col.onSnapshot(snap => {
+                list.innerHTML = '';
+                snap.forEach(doc => renderAcademiaItem(doc));
+            });
+
+            // 2) Submit (create/update)
+            form.addEventListener('submit', async e => {
+                e.preventDefault();
+                await saveAcademia({
+                    id: form.elements['academia-id'].value || null,
+                    title: form.elements['academia-title'].value,
+                    order: parseInt(form.elements['academia-order'].value, 10) || 0,
+                    active: form.elements['academia-active'].checked
+                });
+                form.reset();
+            });
+        }
+
+        function renderAcademiaItem(doc) {
+            const data = doc.data();
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${data.title}</span>
+                <div>
+                    <button class="btn btn-secondary btn-edit"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger btn-delete"><i class="fas fa-trash"></i></button>
+                </div>`;
+            li.querySelector('.btn-edit').addEventListener('click', () => {
+                document.getElementById('academia-id').value = doc.id;
+                document.getElementById('academia-title').value = data.title;
+                document.getElementById('academia-order').value = data.order;
+                document.getElementById('academia-active').checked = data.active;
+            });
+            li.querySelector('.btn-delete').addEventListener('click', async () => {
+                if (confirm('Excluir módulo?')) {
+                    await db.collection('academyModules').doc(doc.id).delete();
+                }
+            });
+            const list = document.getElementById('academia-list');
+            if (list) list.appendChild(li);
+        }
+
+        async function saveAcademia({ id, title, order, active }) {
+            const data = { title, order, active };
+            if (id) {
+                await fsUpdate('academyModules', id, { ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+            } else {
+                await fsAdd('academyModules', { ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            }
         }
 
         // Inicialização da aplicação
