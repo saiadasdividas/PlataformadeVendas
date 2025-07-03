@@ -190,7 +190,8 @@ async function loadUserData() {
         if (userDoc.exists) {
             const userData = userDoc.data();
             console.log('Dados do usuário carregados:', userData);
-            // Aqui você pode processar os dados do usuário conforme necessário
+                filterMenuByRole(userData.role);
+            
         }
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
