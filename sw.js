@@ -1,13 +1,13 @@
 const CACHE_NAME = 'plataforma-embalagens-v1.0.0';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/vendor/firebase/firebase-app-compat.js',
-  '/vendor/firebase/firebase-auth-compat.js',
-  '/vendor/firebase/firebase-firestore-compat.js',
-  '/vendor/firebase/firebase-storage-compat.js',
+  './',
+  'index.html',
+  'vendor/firebase/firebase-app-compat.js',
+  'vendor/firebase/firebase-auth-compat.js',
+  'vendor/firebase/firebase-firestore-compat.js',
+  'vendor/firebase/firebase-storage-compat.js',
   'https://cdn.jsdelivr.net/npm/chart.js',
-  '/vendor/fontawesome/css/all.min.css'
+  'vendor/fontawesome/css/all.min.css'
 ];
 
 self.addEventListener('install', (event) => {
@@ -16,7 +16,7 @@ self.addEventListener('install', (event) => {
       .then((cache) => {
         self.registration.showNotification('Cache aberto', {
           body: 'Recursos prontos para uso',
-          icon: '/icon-192x192.png'
+          icon: 'icon-192x192.png'
         });
         return cache.addAll(urlsToCache);
       })
@@ -45,7 +45,7 @@ self.addEventListener('activate', (event) => {
           if (cacheName !== CACHE_NAME) {
             self.registration.showNotification('Limpando cache antigo', {
               body: cacheName,
-              icon: '/icon-192x192.png'
+              icon: 'icon-192x192.png'
             });
             return caches.delete(cacheName);
           }
@@ -59,8 +59,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'Nova notificação',
-    icon: '/icon-192x192.png',
-    badge: '/badge-72x72.png',
+    icon: 'icon-192x192.png',
+    badge: 'badge-72x72.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -70,12 +70,12 @@ self.addEventListener('push', (event) => {
       {
         action: 'explore',
         title: 'Ver detalhes',
-        icon: '/icon-explore.png'
+        icon: 'icon-explore.png'
       },
       {
         action: 'close',
         title: 'Fechar',
-        icon: '/icon-close.png'
+        icon: 'icon-close.png'
       }
     ]
   };
@@ -92,7 +92,7 @@ self.addEventListener('notificationclick', (event) => {
   if (event.action === 'explore') {
     // Abrir a aplicação
     event.waitUntil(
-      clients.openWindow('/')
+      clients.openWindow('./')
     );
   } else if (event.action === 'close') {
     // Apenas fechar a notificação
@@ -100,7 +100,7 @@ self.addEventListener('notificationclick', (event) => {
   } else {
     // Ação padrão - abrir a aplicação
     event.waitUntil(
-      clients.openWindow('/')
+      clients.openWindow('./')
     );
   }
 });
@@ -117,7 +117,7 @@ function doBackgroundSync() {
     clients.forEach((client) => client.postMessage({ type: 'process-queue' }));
     self.registration.showNotification('Sincronização em background', {
       body: 'Dados sincronizados',
-      icon: '/icon-192x192.png'
+      icon: 'icon-192x192.png'
     });
   });
 }
@@ -134,7 +134,7 @@ function handleSharedData(data) {
   // Implementar processamento de dados compartilhados
   self.registration.showNotification('Dados compartilhados', {
     body: JSON.stringify(data),
-    icon: '/icon-192x192.png'
+    icon: 'icon-192x192.png'
   });
   return Promise.resolve();
 }

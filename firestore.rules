@@ -15,6 +15,12 @@ service cloud.firestore {
       allow write: if request.auth.token.role == 'SUPER_ADMIN';
     }
 
+    // Módulos de Academia (coleção antiga)
+    match /academyModules/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.token.role == 'SUPER_ADMIN';
+    }
+
     // Módulos de Gamificação
     match /gamificationModules/{docId} {
       allow read: if request.auth != null;

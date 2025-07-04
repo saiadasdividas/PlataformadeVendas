@@ -2533,7 +2533,7 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
         // Configurações de PWA (Progressive Web App)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('sw.js')
                     .then((registration) => {
                         showNotification('PWA ativo', 'success');
                     })
