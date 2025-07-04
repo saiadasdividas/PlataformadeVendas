@@ -4,180 +4,88 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plataforma Embalagens Conceito</title>
-   <!-- Firebase SDKs -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Carrega configuracoes do Firebase antes do script principal -->
-       
-    <!-- Seus estilos -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Carrega configuracoes do Firebase antes do script principal -->
+  <!-- Seus estilos -->
   <link rel="stylesheet" href="dist/styles.css" />
 </head>
-<body>
-  
-    <!-- Login Page -->
-    <div id="loginPage" class="login-container">
-        <div class="card login-card">
-            <div class="login-icon">
-                <i class="fas fa-box"></i>
-            </div>
-            <h1 class="login-title">Bem-vindo</h1>
-            <p class="login-subtitle">Plataforma Embalagens Conceito</p>
-            
-            <div id="loginAlert" class="alert alert-error hidden"></div>
-            
-            <form id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="loginEmail" class="input" placeholder="seu@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Senha</label>
-                    <input type="password" id="loginPassword" class="input" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                    <span id="loginBtnText">Entrar</span>
-                    <div id="loginLoading" class="loading hidden"></div>
-                </button>
-            </form>
+<body class="bg-gray-100 text-gray-800">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <nav class="w-64 bg-glass-bg backdrop-blur-sm border-r border-glass-border p-4">
+      <div class="mb-8">
+        <img src="/logo.png" alt="Embalagens" class="w-32 mx-auto"/>
+      </div>
+      <ul class="space-y-2">
+        <li><a href="index.html" class="flex items-center p-2 rounded-lg hover:bg-gradient-to-r from-purple-400 to-purple-600 text-white"><i class="fas fa-home mr-2"></i>Dashboard</a></li>
+        <li><a href="#" class="flex items-center p-2 rounded-lg hover:bg-gradient-to-r from-purple-400 to-purple-600 text-white"><i class="fas fa-graduation-cap mr-2"></i>Academia</a></li>
+        <li><a href="#" class="flex items-center p-2 rounded-lg hover:bg-gradient-to-r from-purple-400 to-purple-600 text-white"><i class="fas fa-gamepad mr-2"></i>Gamificação</a></li>
+        <li><a href="#" class="flex items-center p-2 rounded-lg hover:bg-gradient-to-r from-purple-400 to-purple-600 text-white"><i class="fas fa-briefcase mr-2"></i>CRM & Vendas</a></li>
+        <li><a href="#" class="flex items-center p-2 rounded-lg hover:bg-gradient-to-r from-purple-400 to-purple-600 text-white"><i class="fas fa-user-tie mr-2"></i>MR Representações</a></li>
+        <li><a href="#" class="flex items-center p-2 rounded-lg hover:bg-gradient-to-r from-purple-400 to-purple-600 text-white"><i class="fas fa-user mr-2"></i>Perfil</a></li>
+        <li><a href="#" class="flex items-center p-2 rounded-lg hover:bg-gradient-to-r from-purple-400 to-purple-600 text-white"><i class="fas fa-cog mr-2"></i>Admin</a></li>
+      </ul>
+    </nav>
+    <!-- Main content -->
+    <main class="flex-1 p-6">
+      <!-- Header -->
+      <header class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold">Painel Administrativo</h1>
+        <div class="space-x-2">
+          <button class="btn-primary px-4 py-2">Novo Usuário</button>
+          <button class="btn-outline px-4 py-2">Nova Campanha</button>
         </div>
-    </div>
-
-    <!-- Main App -->
-    <div id="mainApp" class="app-container hidden">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <span id="logoText">Embalagens</span>
-                </div>
-                <button id="sidebarToggle" class="btn-secondary" style="padding: 8px;">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-            </div>
-            
-           <nav class="nav-menu" id="navMenu">
-                <a href="#" class="nav-item" data-page="dashboard">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-item" data-page="academia">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Academia</span>
-                </a>
-                <a href="#" class="nav-item" data-page="gamificacao">
-                    <i class="fas fa-gamepad"></i>
-                    <span>Gamificação</span>
-                </a>
-                <a href="#" class="nav-item" data-page="crm">
-                    <i class="fas fa-briefcase"></i>
-                    <span>CRM & Vendas</span>
-                </a>
-                <a href="#" class="nav-item" data-page="mr-representacoes">
-                    <i class="fas fa-user-tie"></i>
-                    <span>MR Representações</span>
-                </a>
-                <a href="#" class="nav-item" data-page="perfil">
-                    <i class="fas fa-user"></i>
-                    <span>Perfil</span>
-                </a>
-                <a href="#" class="nav-item" data-page="admin">
-                    <i class="fas fa-cog"></i>
-                    <span>Admin</span>
-                </a>
-            </nav>
-            
-            <div class="user-info">
-                <div class="user-profile">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <div class="user-details">
-                        <h4 id="userName">Usuário</h4>
-                        <div class="user-points">
-                            <i class="fas fa-trophy" style="color: #f59e0b;"></i>
-                            <span id="userPoints">1,234 pts</span>
-                        </div>
-                    </div>
-                </div>
-                <button id="logoutBtn" class="btn btn-secondary" style="width: 100%;">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Sair</span>
-                </button>
-            </div>
+      </header>
+      <!-- Conteúdo específico -->
+      <section id="dashboard-content">
+        <!-- cards de estatísticas, tabelas, etc. -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="glass-card">
+            <h2 class="text-lg font-semibold mb-2">Usuários</h2>
+            <p class="text-2xl font-bold">1,234</p>
+          </div>
+          <div class="glass-card">
+            <h2 class="text-lg font-semibold mb-2">Vendas</h2>
+            <p class="text-2xl font-bold">R$ 12.345</p>
+          </div>
+          <div class="glass-card">
+            <h2 class="text-lg font-semibold mb-2">Campanhas</h2>
+            <p class="text-2xl font-bold">8</p>
+          </div>
         </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <header class="header">
-                <h1 class="header-title" id="pageTitle">Dashboard</h1>
-                <div class="header-actions">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="input" placeholder="Buscar...">
-                    </div>
-                    <button class="notification-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
-                </div>
-            </header>
-            
-            <div class="content-area" id="contentArea">
-                <!-- O conteúdo será carregado dinamicamente aqui -->
-            </div>
+        <div class="glass-card">
+          <h2 class="text-xl font-semibold mb-4">Tabela de Exemplo</h2>
+          <table class="min-w-full text-left">
+            <thead>
+              <tr>
+                <th class="py-2 px-4">Nome</th>
+                <th class="py-2 px-4">Status</th>
+                <th class="py-2 px-4">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="py-2 px-4">João Silva</td>
+                <td class="py-2 px-4">Ativo</td>
+                <td class="py-2 px-4"><button class="btn-outline px-2 py-1">Editar</button></td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4">Maria Souza</td>
+                <td class="py-2 px-4">Inativo</td>
+                <td class="py-2 px-4"><button class="btn-outline px-2 py-1">Editar</button></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </div>
-
-    <!-- Modals -->
-    <div id="addProspectModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Novo Prospect</h2>
-                <button class="close-btn" onclick="closeModal('addProspectModal')">&times;</button>
-            </div>
-            <form id="addProspectForm">
-                <div class="form-group">
-                    <label class="form-label">Nome</label>
-                    <input type="text" id="prospectName" class="input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Empresa</label>
-                    <input type="text" id="prospectCompany" class="input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="prospectEmail" class="input" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Salvar</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="addModuleModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Novo Módulo</h2>
-                <button class="close-btn" onclick="closeModal('addModuleModal')">&times;</button>
-            </div>
-            <form id="addModuleForm">
-                <div class="form-group">
-                    <label class="form-label">Título</label>
-                    <input type="text" id="moduleTitle" class="input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Descrição</label>
-                    <textarea id="moduleDescription" class="input" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Salvar</button>
-            </form>
-        </div>
-    </div>
- <script src="config.js"></script>
-<script src="main.js"></script>
+      </section>
+    </main>
+  </div>
+  <script src="config.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
