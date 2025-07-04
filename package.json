@@ -7,7 +7,7 @@
     "test": "jest",
     "build:css:dist": "tailwindcss -i ./src/input.css -o ./dist/styles.css --minify",
     "build:css:root": "npx tailwindcss -i ./input.css -o ./styles.css --minify",
-    "build:css": "postcss input.css -o styles.css --verbose"
+    "build:css": "postcss ./src/input.css -o styles.css --verbose"
   },
   "author": "",
   "license": "ISC",
