@@ -1,4 +1,4 @@
-        // Configuração do Firebase em arquivo externo config.js
+// Configuração do Firebase em arquivo externo config.js
 
 // Inicializar Firebase
 const auth = firebase.auth();
@@ -186,15 +186,54 @@ async function loadUserData() {
         const userDoc = await db.collection('users').doc(currentUser.uid).get();
         if (userDoc.exists) {
             const userData = userDoc.data();
-            console.log('Dados do usuário carregados:', userData);
-            // Aqui você pode processar os dados do usuário conforme necessário
+            userRole = userData.profile?.role || 'USER';
+            // Atualizar UI com dados do usuário
+            document.getElementById('userName').textContent = userData.profile?.name || currentUser.email;
+            document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
+            document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
+            renderMenuForRole(userRole);
+        } else {
+            // Criar perfil padrão se não existir
+            await createDefaultUserProfile();
         }
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
     }
 }
 
-// Função loadPage (adicione se não existir)
+async function createDefaultUserProfile() {
+    const defaultProfile = {
+        profile: {
+            name: currentUser.displayName || currentUser.email,
+            email: currentUser.email,
+            role: 'USER',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        },
+        stats: {
+            totalPoints: 0,
+            level: 1,
+            badges: [],
+            achievements: []
+        }
+    };
+
+    await db.collection('users').doc(currentUser.uid).set(defaultProfile);
+    userRole = 'USER';
+}
+
+async function updateUserProfile(uid, profileData) {
+    if (!isAdmin()) {
+        throw new Error('Permissão negada');
+    }
+
+    await fsUpdate('users', uid, {
+        profile: {
+            ...profileData,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }
+    });
+}
+
 function loadPage(page) {
     console.log('Carregando página:', page);
     
@@ -294,7 +333,7 @@ function loadAdmin() {
                     document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
                     document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
                     
-                    configureMenu();
+                    renderMenuForRole(userRole);
                 } else {
                     // Criar perfil padrão se não existir
                     await createDefaultUserProfile();
@@ -1675,10 +1714,7 @@ function loadAdmin() {
                             <h4 style="margin-bottom: 16px;">Usuários Recentes</h4>
                             <div class="user-list">
                                 <div class="user-item" style="display: flex; align-items: center; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;">
-                                    <div style="width: 40px; height: 40
-
-
-px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">JS</div>
+                                    <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">JS</div>
                                     <div style="flex: 1;">
                                         <div style="font-weight: 600;">João Silva</div>
                                         <div style="font-size: 12px; color: var(--text-light);">SDR - Cadastrado hoje</div>
@@ -1720,16 +1756,16 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                         <div class="content-stats">
                             <h4 style="margin-bottom: 16px;">Estatísticas de Conteúdo</h4>
                             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
-                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary);">16</div>
+                                <div style="padding: 16px; background: #f0f9ff; border-radius: 8px;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--primary); margin-bottom: 4px;">16</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Módulos</div>
                                 </div>
-                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
-                                    <div style="font-size: 20px; font-weight: 700; color: var(--success);">45</div>
+                                <div style="padding: 16px; background: #f0fdf4; border-radius: 8px;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--success); margin-bottom: 4px;">45</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Artigos</div>
                                 </div>
-                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
-                                    <div style="font-size: 20px; font-weight: 700; color: var(--warning);">23</div>
+                                <div style="padding: 16px; background: #f0fdf4; border-radius: 8px;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--warning); margin-bottom: 4px;">23</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Vídeos</div>
                                 </div>
                             </div>
@@ -2425,66 +2461,6 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
             }
         });
 
-        // Funções de exportação de dados
-        function exportToCSV(data, filename) {
-            const csv = data.map(row => Object.values(row).join(',')).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
-
-        // Funções de relatórios
-        async function generateReport(type, dateRange) {
-            try {
-                let query = db.collection('activities');
-                
-                if (dateRange.start) {
-                    query = query.where('timestamp', '>=', dateRange.start);
-                }
-                if (dateRange.end) {
-                    query = query.where('timestamp', '<=', dateRange.end);
-                }
-                
-                const snapshot = await query.get();
-                const data = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                
-                return data;
-            } catch (error) {
-                console.error('Erro ao gerar relatório:', error);
-                return [];
-            }
-        }
-
-        // Configurações de PWA (Progressive Web App)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        showNotification('PWA ativo', 'success');
-                    })
-                    .catch((registrationError) => {
-                        showNotification('Falha ao registrar service worker', 'error');
-                    });
-            });
-        }
-
-        // Detectar modo offline/online
-        window.addEventListener('online', () => {
-            showNotification('Conexão restaurada!', 'success');
-            processOfflineQueue();
-        });
-
-        window.addEventListener('offline', () => {
-            showNotification('Você está offline. Algumas funcionalidades podem não estar disponíveis.', 'warning');
-        });
-
         // ----- Fila offline utilizando IndexedDB -----
         let queueDbPromise;
 
@@ -2738,4 +2714,4 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         showNotification('Plataforma Embalagens Conceito - Versão 1.0.0', 'info');
         showNotification('Desenvolvida com ❤️ para a equipe de vendas', 'info');
-    
+
