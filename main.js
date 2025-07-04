@@ -436,18 +436,6 @@ function loadAdmin() {
                         </div>
                     </div>
                 </div>
-
-                <form id="academia-form" style="margin:16px 0;">
-                    <input type="hidden" id="academia-id">
-                    <input id="academia-title" class="input" placeholder="Título" required>
-                    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
-                    <label style="display:block;margin:8px 0;">
-                        <input type="checkbox" id="academia-active"> Ativo
-                    </label>
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                </form>
-                <ul id="academia-list" class="modules-list"></ul>
-
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
@@ -552,6 +540,16 @@ function loadAdmin() {
                     </button>` : ''}
                 </div>
 
+<form id="academia-form" style="margin:16px 0;">
+    <input type="hidden" id="academia-id">
+    <input id="academia-title" class="input" placeholder="Título" required>
+    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
+    <label style="display:block;margin:8px 0;">
+        <input type="checkbox" id="academia-active"> Ativo
+    </label>
+    <button type="submit" class="btn btn-primary">Salvar</button>
+</form>
+<ul id="academia-list" class="modules-list"></ul>
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
