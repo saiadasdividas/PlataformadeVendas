@@ -1,36 +1,59 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ============= Usuários ============
+
+    // Usuários: cada um só lê/edita seu próprio documento
     match /users/{userId} {
-      allow read, update: if request.auth.uid == userId;
       allow create: if request.auth != null;
+      allow read, update: if request.auth.uid == userId;
       allow delete: if false;
     }
-    // ============= Módulos de Academia / Gamificação / CRM / Sales ============
-    match /{collection=trainingModules, gamificationModules, crmModules, salesModules}/{doc} {
+
+    // Módulos de Academia
+    match /trainingModules/{docId} {
       allow read: if request.auth != null;
       allow write: if request.auth.token.role == 'SUPER_ADMIN';
     }
-    // ============= Prospects (SDR) ============
-    match /prospects/{doc} {
-      allow read, write: if request.auth.token.role in ['USER_SDR','SUPER_ADMIN'];
+
+    // Módulos de Gamificação
+    match /gamificationModules/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.token.role == 'SUPER_ADMIN';
     }
-    // ============= Vendas (Vendedor) ============
-    match /sales/{doc} {
-      allow read, write: if request.auth.token.role in ['USER_VENDEDOR','SUPER_ADMIN'];
+
+    // Módulos de CRM
+    match /crmModules/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.token.role == 'SUPER_ADMIN';
     }
-    // ============= Sugestões ============
-    match /suggestions/{doc} {
+
+    // Módulos de Sales (front-end “Sales”)
+    match /salesModules/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.token.role == 'SUPER_ADMIN';
+    }
+
+    // Prospects (SDR)
+    match /prospects/{docId} {
+      allow read, write: if request.auth.token.role in ['USER_SDR', 'SUPER_ADMIN'];
+    }
+
+    // Vendas (Vendedor)
+    match /sales/{docId} {
+      allow read, write: if request.auth.token.role in ['USER_VENDEDOR', 'SUPER_ADMIN'];
+    }
+
+    // Sugestões
+    match /suggestions/{docId} {
       allow create: if request.auth != null;
       allow read: if resource.data.createdBy == request.auth.uid
                   || request.auth.token.role == 'SUPER_ADMIN';
       allow update, delete: if false;
     }
-    // ============= Defaults ============
+
+    // Qualquer outro caminho: negar
     match /{document=**} {
-      allow read: if false;
-      allow write: if false;
+      allow read, write: if false;
     }
   }
 }
