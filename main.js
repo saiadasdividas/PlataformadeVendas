@@ -1,4 +1,4 @@
-// Configuração do Firebase em arquivo externo config.js
+        // Configuração do Firebase em arquivo externo config.js
 
 // Inicializar Firebase
 const auth = firebase.auth();
@@ -23,8 +23,8 @@ const navConfig = {
     ADMIN_OPERACIONAL: ['dashboard','academia','gamificacao','crm','perfil','admin'],
     ADMIN_CONTEUDO: ['dashboard','academia','perfil','admin'],
     ADMIN_GAMIFICACAO: ['dashboard','academia','gamificacao','perfil','admin'],
-    USER_SDR: ['dashboard','academia','crm','perfil','gamificacao'],
-    USER_VENDEDOR: ['dashboard','crm','perfil','gamificacao'],
+    USER_SDR: ['dashboard','academia','crm','perfil'],
+    USER_VENDEDOR: ['dashboard','crm','perfil'],
     MR_RESPONSAVEL: ['dashboard','academia','perfil'],
     USER: ['dashboard','perfil']
 };
@@ -42,13 +42,6 @@ function renderMenuForRole(role) {
     };
 
     const menu = document.getElementById('navMenu');
-    if (!menu) {
-        console.error('Elemento navMenu não encontrado no DOM');
-        return;
-    }
-
-    // Limpa itens existentes para evitar duplicações quando a função é chamada
-    // múltiplas vezes (ex.: após novo login ou atualização de permissões)
     menu.innerHTML = '';
 
     (navConfig[role] || navConfig.USER).forEach(page => {
@@ -94,7 +87,7 @@ auth.onAuthStateChanged(async (user) => {
         userRole = idTokenResult.claims.role || 'USER';
         currentUser = user;
 
-        await loadUserData();    // carrega dados do Firestore
+        await loadUserData();    // já existente: carrega dados do Firestore
         renderMenuForRole(userRole); // monta o menu de acordo com a role
         showMainApp();
         loadPage(currentPage);
@@ -194,8 +187,7 @@ async function loadUserData() {
         if (userDoc.exists) {
             const userData = userDoc.data();
             console.log('Dados do usuário carregados:', userData);
-                filterMenuByRole(userData.role);
-            
+            // Aqui você pode processar os dados do usuário conforme necessário
         }
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -244,84 +236,8 @@ function loadPage(page) {
 function loadDashboard() {
     const contentArea = document.getElementById('contentArea');
     if (contentArea) {
-        contentArea.innerHTML = `
-        <section id="dashboard-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div class="glass-card">
-            <div class="flex items-center mb-4">
-              <i class="fas fa-users text-2xl mr-3 text-purple-500"></i>
-              <span class="text-xl font-semibold">47</span>
-            </div>
-            <p class="text-gray-600">Usuários Ativos</p>
-          </div>
-          <div class="glass-card">
-            <div class="flex items-center mb-4">
-              <i class="fas fa-layer-group text-2xl mr-3 text-purple-500"></i>
-              <span class="text-xl font-semibold">12</span>
-            </div>
-            <p class="text-gray-600">Módulos Criados</p>
-          </div>
-          <div class="glass-card">
-            <div class="flex items-center mb-4">
-              <i class="fas fa-bullhorn text-2xl mr-3 text-purple-500"></i>
-              <span class="text-xl font-semibold">5</span>
-            </div>
-            <p class="text-gray-600">Campanhas Ativas</p>
-          </div>
-        </section>
-        <div class="tabs flex space-x-4 mb-4 mt-8">
-          <button data-tab="users" class="btn-tab active">Gerenciar Usuários</button>
-          <button data-tab="perms" class="btn-tab">Permissões</button>
-          <button data-tab="teams" class="btn-tab">Equipes</button>
-        </div>
-        <div id="tab-users" class="tab-content">
-          <!-- tabela + botão modal de Novo Usuário -->
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold">Usuários</h3>
-            <button class="btn-primary px-4 py-2">Novo Usuário</button>
-          </div>
-          <table class="min-w-full text-left">
-            <thead>
-              <tr>
-                <th class="py-2 px-4">Nome</th>
-                <th class="py-2 px-4">Status</th>
-                <th class="py-2 px-4">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="py-2 px-4">João Silva</td>
-                <td class="py-2 px-4">Ativo</td>
-                <td class="py-2 px-4"><button class="btn-outline px-2 py-1">Editar</button></td>
-              </tr>
-              <tr>
-                <td class="py-2 px-4">Maria Souza</td>
-                <td class="py-2 px-4">Inativo</td>
-                <td class="py-2 px-4"><button class="btn-outline px-2 py-1">Editar</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div id="tab-perms" class="tab-content hidden">
-          <div class="glass-card">Conteúdo de permissões</div>
-        </div>
-        <div id="tab-teams" class="tab-content hidden">
-          <div class="glass-card">Conteúdo de equipes</div>
-        </div>
-        `;
-        // Ativa o JS das tabs
-        setupTabs();
+        contentArea.innerHTML = '<h2>Dashboard</h2><p>Bem-vindo ao dashboard!</p>';
     }
-}
-
-function setupTabs() {
-    document.querySelectorAll('.btn-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.btn-tab').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
-            btn.classList.add('active');
-            document.getElementById(`tab-${btn.dataset.tab}`).classList.remove('hidden');
-        });
-    });
 }
 
 function loadAcademia() {
@@ -378,7 +294,7 @@ function loadAdmin() {
                     document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
                     document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
                     
-
+                    configureMenu();
                 } else {
                     // Criar perfil padrão se não existir
                     await createDefaultUserProfile();
@@ -512,6 +428,7 @@ function loadAdmin() {
                         </div>
                     </div>
                 </div>
+
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
@@ -616,16 +533,6 @@ function loadAdmin() {
                     </button>` : ''}
                 </div>
 
-<form id="academia-form" style="margin:16px 0;">
-    <input type="hidden" id="academia-id">
-    <input id="academia-title" class="input" placeholder="Título" required>
-    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
-    <label style="display:block;margin:8px 0;">
-        <input type="checkbox" id="academia-active"> Ativo
-    </label>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-</form>
-<ul id="academia-list" class="modules-list"></ul>
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
@@ -727,86 +634,192 @@ function loadAdmin() {
             `;
         }
 
-        function getAdminDashboard() {
-            return getUserDashboard();
-        }
-
-        function getAcademiaContent() {
+        function getGamificacaoContent() {
             return `
                 <div class="module-header">
                     <div>
-                        <h1 class="module-title">Academia de Treinamentos</h1>
-                        <p class="module-subtitle">Desenvolva suas habilidades com nossos módulos especializados</p>
+                        <h1 class="module-title">Gamificação</h1>
+                        <p class="module-subtitle">Acompanhe seu progresso, conquistas e posição no ranking</p>
                     </div>
-                    ${isAdmin() ? `
-                    <button class="btn btn-primary" onclick="openModal('addModuleModal')">
-                        <i class="fas fa-plus"></i>
-                        Novo Módulo
-                    </button>` : ''}
                 </div>
 
-<form id="academia-form" style="margin:16px 0;">
-    <input type="hidden" id="academia-id">
-    <input id="academia-title" class="input" placeholder="Título" required>
-    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
-    <label style="display:block;margin:8px 0;">
-        <input type="checkbox" id="academia-active"> Ativo
-    </label>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-</form>
-<ul id="academia-list" class="modules-list"></ul>
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-user-tie"></i>
-                            SDR Mastery
+                            <i class="fas fa-trophy"></i>
+                            Ranking Geral
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Sales Development Representatives</p>
-                        
-                        <div id="trainingModules" class="modules-list"></div>
+                        <ul class="ranking-list">
+                            <li class="ranking-item">
+                                <div class="ranking-position" style="background: #ffd700;">1</div>
+                                <div class="ranking-info">
+                                    <h4>João Silva</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">SDR</p>
+                                </div>
+                                <div class="ranking-points">2,450 pts</div>
+                            </li>
+                            <li class="ranking-item">
+                                <div class="ranking-position" style="background: #c0c0c0;">2</div>
+                                <div class="ranking-info">
+                                    <h4>Maria Santos</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Vendedora</p>
+                                </div>
+                                <div class="ranking-points">2,180 pts</div>
+                            </li>
+                            <li class="ranking-item" style="background: #f0f9ff; border-color: var(--primary);">
+                                <div class="ranking-position" style="background: #cd7f32;">3</div>
+                                <div class="ranking-info">
+                                    <h4>Você</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">SDR</p>
+                                </div>
+                                <div class="ranking-points">1,890 pts</div>
+                            </li>
+                            <li class="ranking-item">
+                                <div class="ranking-position">4</div>
+                                <div class="ranking-info">
+                                    <h4>Carlos Oliveira</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Vendedor</p>
+                                </div>
+                                <div class="ranking-points">1,650 pts</div>
+                            </li>
+                            <li class="ranking-item">
+                                <div class="ranking-position">5</div>
+                                <div class="ranking-info">
+                                    <h4>Ana Costa</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">SDR</p>
+                                </div>
+                                <div class="ranking-points">1,420 pts</div>
+                            </li>
+                        </ul>
                     </div>
 
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-handshake"></i>
-                            Vendas Internas
+                            <i class="fas fa-medal"></i>
+                            Minhas Conquistas
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Vendedores Internos</p>
-                        
-                        <div class="modules-list">
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-1')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
-                                    <i class="fas fa-play"></i>
+                        <div class="badges-grid">
+                            <div class="badge-item">
+                                <div class="badge-icon">
+                                    <i class="fas fa-graduation-cap"></i>
                                 </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">1. Vendas Consultivas</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Técnicas de venda baseadas em consultoria</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge badge-primary">Disponível</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+80 pontos</span>
-                                    </div>
+                                <div class="badge-name">Estudioso</div>
+                                <div class="badge-description">5 módulos concluídos</div>
+                            </div>
+                            <div class="badge-item">
+                                <div class="badge-icon">
+                                    <i class="fas fa-phone"></i>
                                 </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Não iniciado</div>
+                                <div class="badge-name">Comunicador</div>
+                                <div class="badge-description">100 ligações realizadas</div>
+                            </div>
+                            <div class="badge-item">
+                                <div class="badge-icon">
+                                    <i class="fas fa-target"></i>
+                                </div>
+                                <div class="badge-name">Certeiro</div>
+                                <div class="badge-description">Meta batida 3x seguidas</div>
+                            </div>
+                            <div class="badge-item" style="opacity: 0.5;">
+                                <div class="badge-icon" style="background: #e2e8f0; color: var(--text-light);">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <div class="badge-name">Lenda</div>
+                                <div class="badge-description">Top 1 por 3 meses</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card section-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Progresso por Categoria
+                        </h2>
+                        <div class="progress-categories">
+                            <div class="category-item" style="margin-bottom: 24px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-weight: 600;">📚 Aprendizado</span>
+                                    <span style="color: var(--text-light);">450/500 pts</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 90%;"></div>
                                 </div>
                             </div>
+                            <div class="category-item" style="margin-bottom: 24px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-weight: 600;">💼 Vendas</span>
+                                    <span style="color: var(--text-light);">320/400 pts</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 80%;"></div>
+                                </div>
+                            </div>
+                            <div class="category-item" style="margin-bottom: 24px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-weight: 600;">🎯 Metas</span>
+                                    <span style="color: var(--text-light);">280/350 pts</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 80%;"></div>
+                                </div>
+                            </div>
+                            <div class="category-item">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-weight: 600;">⚡ Atividade</span>
+                                    <span style="color: var(--text-light);">190/300 pts</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 63%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-2')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-light); margin-right: 16px;">
-                                    <i class="fas fa-lock"></i>
+                    <div class="card section-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-gift"></i>
+                            Loja de Recompensas
+                        </h2>
+                        <div class="rewards-grid" style="display: grid; gap: 16px;">
+                            <div class="reward-item" style="display: flex; align-items: center; padding: 16px; border: 1px solid var(--border); border-radius: 12px;">
+                                <div class="reward-icon" style="width: 50px; height: 50px; background: var(--warning); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
+                                    <i class="fas fa-coffee"></i>
                                 </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">2. Atendimento Excepcional</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Como proporcionar uma experiência única ao cliente</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge" style="background: #f1f5f9; color: var(--text-light);">Bloqueado</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+90 pontos</span>
-                                    </div>
+                                <div class="reward-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Vale Café</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">R$ 20 em cafeterias parceiras</p>
                                 </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Bloqueado</div>
+                                <div class="reward-cost" style="text-align: right;">
+                                    <div style="font-weight: 700; color: var(--primary);">500 pts</div>
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; margin-top: 4px;">Resgatar</button>
+                                </div>
+                            </div>
+                            <div class="reward-item" style="display: flex; align-items: center; padding: 16px; border: 1px solid var(--border); border-radius: 12px;">
+                                <div class="reward-icon" style="width: 50px; height: 50px; background: var(--success); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <div class="reward-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Home Office</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">1 dia de trabalho remoto</p>
+                                </div>
+                                <div class="reward-cost" style="text-align: right;">
+                                    <div style="font-weight: 700; color: var(--primary);">1000 pts</div>
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; margin-top: 4px;">Resgatar</button>
+                                </div>
+                            </div>
+                            <div class="reward-item" style="display: flex; align-items: center; padding: 16px; border: 1px solid var(--border); border-radius: 12px; opacity: 0.5;">
+                                <div class="reward-icon" style="width: 50px; height: 50px; background: var(--text-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div class="reward-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Vaga Premium</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Vaga de estacionamento por 1 mês</p>
+                                </div>
+                                <div class="reward-cost" style="text-align: right;">
+                                    <div style="font-weight: 700; color: var(--text-light);">2000 pts</div>
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; margin-top: 4px;" disabled>Insuficiente</button>
                                 </div>
                             </div>
                         </div>
@@ -815,257 +828,468 @@ function loadAdmin() {
 
                 <div class="card section-card">
                     <h2 class="section-title">
-                        <i class="fas fa-book"></i>
-                        Biblioteca de Conteúdo
+                        <i class="fas fa-calendar-check"></i>
+                        Desafios Ativos
                     </h2>
-                    <div class="library-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-alt" style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Artigos Especializados</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">45 artigos disponíveis</p>
+                    <div class="challenges-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+                        <div class="challenge-item card" style="padding: 20px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                                <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 12px;">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Desafio Diário</h4>
+                                    <p style="font-size: 12px; color: var(--text-light);">Expira em 8h</p>
+                                </div>
+                            </div>
+                            <p style="margin-bottom: 16px;">Realize 20 ligações hoje</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 14px;">Progresso</span>
+                                <span style="font-size: 14px; color: var(--text-light);">15/20</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%;"></div>
+                            </div>
+                            <div style="text-align: center; margin-top: 16px;">
+                                <span style="font-weight: 600; color: var(--primary);">+100 pontos</span>
+                            </div>
                         </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-video" style="font-size: 32px; color: var(--success); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Vídeos Educativos</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">23 vídeos disponíveis</p>
+
+                        <div class="challenge-item card" style="padding: 20px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                                <div style="width: 40px; height: 40px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 12px;">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Desafio Semanal</h4>
+                                    <p style="font-size: 12px; color: var(--text-light);">Expira em 3 dias</p>
+                                </div>
+                            </div>
+                            <p style="margin-bottom: 16px;">Complete 2 módulos de treinamento</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 14px;">Progresso</span>
+                                <span style="font-size: 14px; color: var(--text-light);">1/2</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 50%;"></div>
+                            </div>
+                            <div style="text-align: center; margin-top: 16px;">
+                                <span style="font-weight: 600; color: var(--success);">+250 pontos</span>
+                            </div>
                         </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-chart-line" style="font-size: 32px; color: var(--warning); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Cases de Sucesso</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">12 cases disponíveis</p>
-                        </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-download" style="font-size: 32px; color: var(--secondary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Templates e Scripts</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">18 templates disponíveis</p>
+
+                        <div class="challenge-item card" style="padding: 20px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                                <div style="width: 40px; height: 40px; background: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 12px;">
+                                    <i class="fas fa-target"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Desafio Mensal</h4>
+                                    <p style="font-size: 12px; color: var(--text-light);">Expira em 15 dias</p>
+                                </div>
+                            </div>
+                            <p style="margin-bottom: 16px;">Bata todas as metas do mês</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 14px;">Progresso</span>
+                                <span style="font-size: 14px; color: var(--text-light);">2/4</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 50%;"></div>
+                            </div>
+                            <div style="text-align: center; margin-top: 16px;">
+                                <span style="font-weight: 600; color: var(--warning);">+500 pontos</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="card section-card">
-                    <h2 class="section-title">
-                        <i class="fas fa-comment"></i>
-                        Envie seu Feedback
-                    </h2>
-                    <form id="feedbackForm">
-                        <textarea id="feedbackText" class="input" placeholder="Escreva aqui" required style="margin-bottom:12px;"></textarea>
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                    </form>
-                    <div id="myFeedbacks" style="margin-top:16px;"></div>
                 </div>
             `;
         }
 
-        function getAdminDashboard() {
-            return getUserDashboard();
-        }
-
-        function getAcademiaContent() {
+        function getCrmContent() {
             return `
                 <div class="module-header">
                     <div>
-                        <h1 class="module-title">Academia de Treinamentos</h1>
-                        <p class="module-subtitle">Desenvolva suas habilidades com nossos módulos especializados</p>
+                        <h1 class="module-title">CRM & Vendas</h1>
+                        <p class="module-subtitle">Gerencie seus prospects, pipeline e campanhas</p>
                     </div>
-                    ${isAdmin() ? `
-                    <button class="btn btn-primary" onclick="openModal('addModuleModal')">
+                    <button class="btn btn-primary" onclick="openModal('addProspectModal')">
                         <i class="fas fa-plus"></i>
-                        Novo Módulo
-                    </button>` : ''}
+                        Novo Prospect
+                    </button>
                 </div>
 
-<form id="academia-form" style="margin:16px 0;">
-    <input type="hidden" id="academia-id">
-    <input id="academia-title" class="input" placeholder="Título" required>
-    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
-    <label style="display:block;margin:8px 0;">
-        <input type="checkbox" id="academia-active"> Ativo
-    </label>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-</form>
-<ul id="academia-list" class="modules-list"></ul>
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--primary);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>127</h3>
+                            <p>Prospects Ativos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--success);">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>23</h3>
+                            <p>Vendas no Mês</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--warning);">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>R$ 45.2K</h3>
+                            <p>Faturamento</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--secondary);">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>18%</h3>
+                            <p>Taxa de Conversão</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-user-tie"></i>
-                            SDR Mastery
+                            <i class="fas fa-funnel-dollar"></i>
+                            Pipeline de Vendas
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Sales Development Representatives</p>
-                        
-                        <div id="trainingModules" class="modules-list"></div>
+                        <div class="pipeline-stages" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                            <div class="pipeline-stage" style="background: #f8fafc; border-radius: 12px; padding: 16px;">
+                                <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">Prospect Identificado</h4>
+                                <div class="stage-count" style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">45</div>
+                                <div class="stage-value" style="font-size: 14px; color: var(--text-light);">R$ 125.000</div>
+                            </div>
+                            <div class="pipeline-stage" style="background: #f0f9ff; border-radius: 12px; padding: 16px;">
+                                <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">Primeiro Contato</h4>
+                                <div class="stage-count" style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 8px;">32</div>
+                                <div class="stage-value" style="font-size: 14px; color: var(--text-light);">R$ 89.500</div>
+                            </div>
+                            <div class="pipeline-stage" style="background: #f0fdf4; border-radius: 12px; padding: 16px;">
+                                <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">Qualificado</h4>
+                                <div class="stage-count" style="font-size: 24px; font-weight: 700; color: var(--success); margin-bottom: 8px;">18</div>
+                                <div class="stage-value" style="font-size: 14px; color: var(--text-light);">R$ 67.200</div>
+                            </div>
+                            <div class="pipeline-stage" style="background: #fffbeb; border-radius: 12px; padding: 16px;">
+                                <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">Proposta Enviada</h4>
+                                <div class="stage-count" style="font-size: 24px; font-weight: 700; color: var(--warning); margin-bottom: 8px;">12</div>
+                                <div class="stage-value" style="font-size: 14px; color: var(--text-light);">R$ 45.800</div>
+                            </div>
+                            <div class="pipeline-stage" style="background: #f0f9ff; border-radius: 12px; padding: 16px;">
+                                <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">Negociação</h4>
+                                <div class="stage-count" style="font-size: 24px; font-weight: 700; color: var(--secondary); margin-bottom: 8px;">8</div>
+                                <div class="stage-value" style="font-size: 14px; color: var(--text-light);">R$ 32.100</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-handshake"></i>
-                            Vendas Internas
+                            <i class="fas fa-chart-line"></i>
+                            Performance de Vendas
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Vendedores Internos</p>
-                        
-                        <div class="modules-list">
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-1')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
-                                    <i class="fas fa-play"></i>
-                                </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">1. Vendas Consultivas</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Técnicas de venda baseadas em consultoria</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge badge-primary">Disponível</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+80 pontos</span>
-                                    </div>
-                                </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Não iniciado</div>
-                                </div>
-                            </div>
-
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-2')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-light); margin-right: 16px;">
-                                    <i class="fas fa-lock"></i>
-                                </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">2. Atendimento Excepcional</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Como proporcionar uma experiência única ao cliente</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge" style="background: #f1f5f9; color: var(--text-light);">Bloqueado</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+90 pontos</span>
-                                    </div>
-                                </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Bloqueado</div>
-                                </div>
-                            </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
                         </div>
                     </div>
                 </div>
 
                 <div class="card section-card">
-                    <h2 class="section-title">
-                        <i class="fas fa-book"></i>
-                        Biblioteca de Conteúdo
-                    </h2>
-                    <div class="library-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-alt" style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Artigos Especializados</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">45 artigos disponíveis</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h2 class="section-title">
+                            <i class="fas fa-list"></i>
+                            Lista de Prospects
+                        </h2>
+                        <div style="display: flex; gap: 12px;">
+                            <select class="input" style="width: auto;">
+                                <option>Todos os Status</option>
+                                <option>Novo</option>
+                                <option>Contactado</option>
+                                <option>Qualificado</option>
+                                <option>Proposta</option>
+                            </select>
+                            <input type="text" class="input" placeholder="Buscar prospects..." style="width: 250px;">
                         </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-video" style="font-size: 32px; color: var(--success); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Vídeos Educativos</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">23 vídeos disponíveis</p>
-                        </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-chart-line" style="font-size: 32px; color: var(--warning); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Cases de Sucesso</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">12 cases disponíveis</p>
-                        </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-download" style="font-size: 32px; color: var(--secondary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Templates e Scripts</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">18 templates disponíveis</p>
-                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Empresa</th>
+                                    <th>Status</th>
+                                    <th>Valor Potencial</th>
+                                    <th>Último Contato</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prospectRows"></tbody>
+                        </table>
                     </div>
                 </div>
 
                 <div class="card section-card">
                     <h2 class="section-title">
-                        <i class="fas fa-comment"></i>
-                        Envie seu Feedback
+                        <i class="fas fa-bullhorn"></i>
+                        Campanhas Ativas
                     </h2>
-                    <form id="feedbackForm">
-                        <textarea id="feedbackText" class="input" placeholder="Escreva aqui" required style="margin-bottom:12px;"></textarea>
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                    </form>
-                    <div id="myFeedbacks" style="margin-top:16px;"></div>
+                    <div class="campaigns-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+                        <div class="campaign-item card" style="padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                                <h4 style="font-weight: 600;">Campanha Natal 2024</h4>
+                                <span class="badge badge-success">Ativa</span>
+                            </div>
+                            <p style="color: var(--text-light); margin-bottom: 16px;">Embalagens festivas com desconto especial para o período natalino</p>
+                            <div style="margin-bottom: 16px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px;">Meta: R$ 50.000</span>
+                                    <span style="font-size: 14px; color: var(--text-light);">R$ 32.500</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%;"></div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 12px; color: var(--text-light);">Termina em 15 dias</span>
+                                <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;">Ver Detalhes</button>
+                            </div>
+                        </div>
+
+                        <div class="campaign-item card" style="padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                                <h4 style="font-weight: 600;">Black Friday</h4>
+                                <span class="badge badge-warning">Planejada</span>
+                            </div>
+                            <p style="color: var(--text-light); margin-bottom: 16px;">Mega promoção com até 40% de desconto em produtos selecionados</p>
+                            <div style="margin-bottom: 16px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-size: 14px;">Meta: R$ 80.000</span>
+                                    <span style="font-size: 14px; color: var(--text-light);">R$ 0</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 12px; color: var(--text-light);">Inicia em 30 dias</span>
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;">Configurar</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
         }
 
-        function getAdminDashboard() {
-            return getUserDashboard();
-        }
-
-        function getAcademiaContent() {
+        function getMrRepresentacoesContent() {
             return `
                 <div class="module-header">
                     <div>
-                        <h1 class="module-title">Academia de Treinamentos</h1>
-                        <p class="module-subtitle">Desenvolva suas habilidades com nossos módulos especializados</p>
+                        <h1 class="module-title">MR Representações</h1>
+                        <p class="module-subtitle">Gerencie suas tarefas diárias e acompanhe suas metas</p>
                     </div>
-                    ${isAdmin() ? `
-                    <button class="btn btn-primary" onclick="openModal('addModuleModal')">
+                    <button class="btn btn-primary" onclick="openModal('addTaskModal')">
                         <i class="fas fa-plus"></i>
-                        Novo Módulo
-                    </button>` : ''}
+                        Nova Tarefa
+                    </button>
                 </div>
 
-<form id="academia-form" style="margin:16px 0;">
-    <input type="hidden" id="academia-id">
-    <input id="academia-title" class="input" placeholder="Título" required>
-    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
-    <label style="display:block;margin:8px 0;">
-        <input type="checkbox" id="academia-active"> Ativo
-    </label>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-</form>
-<ul id="academia-list" class="modules-list"></ul>
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--success);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>12</h3>
+                            <p>Tarefas Concluídas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--warning);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>5</h3>
+                            <p>Tarefas Pendentes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--primary);">
+                            <i class="fas fa-target"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>85%</h3>
+                            <p>Meta do Mês</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--secondary);">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>7</h3>
+                            <p>Dias Consecutivos</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-user-tie"></i>
-                            SDR Mastery
+                            <i class="fas fa-tasks"></i>
+                            Tarefas Diárias
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Sales Development Representatives</p>
-                        
-                        <div id="trainingModules" class="modules-list"></div>
+                        <div class="tasks-list">
+                            <div class="task-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px;">
+                                <input type="checkbox" checked style="margin-right: 16px; transform: scale(1.2);">
+                                <div class="task-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px; text-decoration: line-through; color: var(--text-light);">Comunicação com clientes (Segunda-feira)</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Enviar newsletter semanal e atualizações</p>
+                                </div>
+                                <span class="badge badge-success">Concluída</span>
+                            </div>
+
+                            <div class="task-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px;">
+                                <input type="checkbox" checked style="margin-right: 16px; transform: scale(1.2);">
+                                <div class="task-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px; text-decoration: line-through; color: var(--text-light);">Stories WhatsApp - Novidades</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Postar lançamentos das empresas representadas</p>
+                                </div>
+                                <span class="badge badge-success">Concluída</span>
+                            </div>
+
+                            <div class="task-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--primary); border-radius: 12px; background: rgba(102, 126, 234, 0.05);">
+                                <input type="checkbox" style="margin-right: 16px; transform: scale(1.2);">
+                                <div class="task-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Stories Instagram MR Representações</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Postar conteúdo diário no Instagram</p>
+                                </div>
+                                <span class="badge badge-warning">Pendente</span>
+                            </div>
+
+                            <div class="task-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px;">
+                                <input type="checkbox" style="margin-right: 16px; transform: scale(1.2);">
+                                <div class="task-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Mensagens para páginas seguidas</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Interagir com páginas parceiras</p>
+                                </div>
+                                <span class="badge badge-warning">Pendente</span>
+                            </div>
+
+                            <div class="task-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px;">
+                                <input type="checkbox" style="margin-right: 16px; transform: scale(1.2);">
+                                <div class="task-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Ligações para clientes pequenos</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Contato semanal com carteira de pequenos clientes</p>
+                                </div>
+                                <span class="badge badge-primary">Semanal</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-handshake"></i>
-                            Vendas Internas
+                            <i class="fas fa-chart-pie"></i>
+                            Progresso Semanal
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Vendedores Internos</p>
-                        
-                        <div class="modules-list">
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-1')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
-                                    <i class="fas fa-play"></i>
-                                </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">1. Vendas Consultivas</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Técnicas de venda baseadas em consultoria</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge badge-primary">Disponível</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+80 pontos</span>
+                        <div class="chart-container">
+                            <canvas id="weeklyTasksChart"></canvas>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span>Meta Semanal</span>
+                                <span>28/35 tarefas</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 80%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card section-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-clipboard-list"></i>
+                            Processos e Procedimentos
+                        </h2>
+                        <div class="procedures-list">
+                            <div class="procedure-item" style="padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer;" onclick="openProcedure('comunicacao-clientes')">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <h4 style="font-weight: 600; margin-bottom: 4px;">📧 Comunicação com Clientes</h4>
+                                        <p style="font-size: 14px; color: var(--text-light);">Processo para comunicação semanal</p>
                                     </div>
-                                </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Não iniciado</div>
+                                    <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
                                 </div>
                             </div>
 
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-2')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-light); margin-right: 16px;">
-                                    <i class="fas fa-lock"></i>
-                                </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">2. Atendimento Excepcional</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Como proporcionar uma experiência única ao cliente</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge" style="background: #f1f5f9; color: var(--text-light);">Bloqueado</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+90 pontos</span>
+                            <div class="procedure-item" style="padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer;" onclick="openProcedure('stories-whatsapp')">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <h4 style="font-weight: 600; margin-bottom: 4px;">📱 Stories WhatsApp</h4>
+                                        <p style="font-size: 14px; color: var(--text-light);">Como criar e postar stories eficazes</p>
                                     </div>
+                                    <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
                                 </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Bloqueado</div>
+                            </div>
+
+                            <div class="procedure-item" style="padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer;" onclick="openProcedure('instagram-posts')">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <h4 style="font-weight: 600; margin-bottom: 4px;">📸 Posts Instagram</h4>
+                                        <p style="font-size: 14px; color: var(--text-light);">Diretrizes para posts no Instagram</p>
+                                    </div>
+                                    <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
                                 </div>
+                            </div>
+
+                            <div class="procedure-item" style="padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer;" onclick="openProcedure('site-manutencao')">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div>
+                                        <h4 style="font-weight: 600; margin-bottom: 4px;">🌐 Manutenção do Site</h4>
+                                        <p style="font-size: 14px; color: var(--text-light);">Checklist de manutenção semanal</p>
+                                    </div>
+                                    <i class="fas fa-chevron-right" style="color: var(--text-light);"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card section-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-lightbulb"></i>
+                            Dicas e Informativos
+                        </h2>
+                        <div class="tips-list">
+                            <div class="tip-item" style="padding: 16px; margin-bottom: 12px; background: #f0f9ff; border-radius: 12px; border-left: 4px solid var(--primary);">
+                                <h4 style="font-weight: 600; margin-bottom: 8px; color: var(--primary);">💡 Dica do Dia</h4>
+                                <p style="font-size: 14px;">Use hashtags relevantes nos stories do Instagram para aumentar o alcance. Máximo de 10 hashtags por story.</p>
+                            </div>
+
+                            <div class="tip-item" style="padding: 16px; margin-bottom: 12px; background: #f0fdf4; border-radius: 12px; border-left: 4px solid var(--success);">
+                                <h4 style="font-weight: 600; margin-bottom: 8px; color: var(--success);">✅ Boas Práticas</h4>
+                                <p style="font-size: 14px;">Sempre responda às mensagens dos clientes em até 2 horas durante o horário comercial.</p>
+                            </div>
+
+                            <div class="tip-item" style="padding: 16px; margin-bottom: 12px; background: #fffbeb; border-radius: 12px; border-left: 4px solid var(--warning);">
+                                <h4 style="font-weight: 600; margin-bottom: 8px; color: var(--warning);">⚠️ Atenção</h4>
+                                <p style="font-size: 14px;">Lembre-se de fazer backup do site antes de qualquer atualização ou manutenção.</p>
                             </div>
                         </div>
                     </div>
@@ -1073,385 +1297,516 @@ function loadAdmin() {
 
                 <div class="card section-card">
                     <h2 class="section-title">
-                        <i class="fas fa-book"></i>
-                        Biblioteca de Conteúdo
+                        <i class="fas fa-calendar-alt"></i>
+                        Agenda da Semana
                     </h2>
-                    <div class="library-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-alt" style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Artigos Especializados</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">45 artigos disponíveis</p>
+                    <div class="weekly-schedule" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px;">
+                        <div class="day-column" style="text-align: center;">
+                            <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">SEG</h4>
+                            <div class="day-tasks">
+                                <div style="background: var(--primary); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                    Comunicação Clientes
+                                </div>
+                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                    Stories WhatsApp
+                                </div>
+                            </div>
                         </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-video" style="font-size: 32px; color: var(--success); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Vídeos Educativos</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">23 vídeos disponíveis</p>
+                        <div class="day-column" style="text-align: center;">
+                            <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">TER</h4>
+                            <div class="day-tasks">
+                                <div style="background: var(--warning); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                    Stories Instagram
+                                </div>
+                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                    Ligações Clientes
+                                </div>
+                            </div>
                         </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-chart-line" style="font-size: 32px; color: var(--warning); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Cases de Sucesso</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">12 cases disponíveis</p>
+                        <div class="day-column" style="text-align: center;">
+                            <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">QUA</h4>
+                            <div class="day-tasks">
+                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                    Stories WhatsApp
+                                </div>
+                                <div style="background: var(--primary); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                    Manutenção Site
+                                </div>
+                            </div>
                         </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-download" style="font-size: 32px; color: var(--secondary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Templates e Scripts</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">18 templates disponíveis</p>
+                        <div class="day-column" style="text-align: center;">
+                            <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">QUI</h4>
+                            <div class="day-tasks">
+                                <div style="background: var(--warning); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                    Stories Instagram
+                                </div>
+                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                    Envio PDFs
+                                </div>
+                            </div>
+                        </div>
+                        <div class="day-column" style="text-align: center;">
+                            <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">SEX</h4>
+                            <div class="day-tasks">
+                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                    Stories WhatsApp
+                                </div>
+                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                    Relatório Semanal
+                                </div>
+                            </div>
+                        </div>
+                        <div class="day-column" style="text-align: center; opacity: 0.5;">
+                            <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">SAB</h4>
+                            <div class="day-tasks">
+                                <div style="background: var(--border); color: var(--text-light); padding: 8px; border-radius: 8px; font-size: 12px;">
+                                    Descanso
+                                </div>
+                            </div>
+                        </div>
+                        <div class="day-column" style="text-align: center; opacity: 0.5;">
+                            <h4 style="font-weight: 600; margin-bottom: 12px; color: var(--text-light);">DOM</h4>
+                            <div class="day-tasks">
+                                <div style="background: var(--border); color: var(--text-light); padding: 8px; border-radius: 8px; font-size: 12px;">
+                                    Descanso
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="card section-card">
-                    <h2 class="section-title">
-                        <i class="fas fa-comment"></i>
-                        Envie seu Feedback
-                    </h2>
-                    <form id="feedbackForm">
-                        <textarea id="feedbackText" class="input" placeholder="Escreva aqui" required style="margin-bottom:12px;"></textarea>
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                    </form>
-                    <div id="myFeedbacks" style="margin-top:16px;"></div>
                 </div>
             `;
         }
 
-        function getAdminDashboard() {
-            return getUserDashboard();
-        }
-
-        function getAcademiaContent() {
+        function getPerfilContent() {
+            const isAdmin = ['SUPER_ADMIN', 'ADMIN_OPERACIONAL', 'ADMIN_CONTEUDO', 'ADMIN_GAMIFICACAO'].includes(userRole);
             return `
                 <div class="module-header">
                     <div>
-                        <h1 class="module-title">Academia de Treinamentos</h1>
-                        <p class="module-subtitle">Desenvolva suas habilidades com nossos módulos especializados</p>
+                        <h1 class="module-title">Meu Perfil</h1>
+                        <p class="module-subtitle">Gerencie suas informações pessoais e configurações</p>
                     </div>
-                    ${isAdmin() ? `
-                    <button class="btn btn-primary" onclick="openModal('addModuleModal')">
-                        <i class="fas fa-plus"></i>
-                        Novo Módulo
+                    ${isAdmin ? `
+                    <button class="btn btn-primary">
+                        <i class="fas fa-edit"></i>
+                        Editar Perfil
                     </button>` : ''}
                 </div>
 
-<form id="academia-form" style="margin:16px 0;">
-    <input type="hidden" id="academia-id">
-    <input id="academia-title" class="input" placeholder="Título" required>
-    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
-    <label style="display:block;margin:8px 0;">
-        <input type="checkbox" id="academia-active"> Ativo
-    </label>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-</form>
-<ul id="academia-list" class="modules-list"></ul>
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-user-tie"></i>
-                            SDR Mastery
+                            <i class="fas fa-user"></i>
+                            Informações Pessoais
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Sales Development Representatives</p>
-                        
-                        <div id="trainingModules" class="modules-list"></div>
+                        <div class="profile-info">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Nome Completo</label>
+                                    <input type="text" class="input" value="João Silva" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="input" value="joao@embalagenconceito.com" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Cargo</label>
+                                    <input type="text" class="input" value="SDR" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Departamento</label>
+                                    <input type="text" class="input" value="Vendas" readonly>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Data de Admissão</label>
+                                    <input type="text" class="input" value="15/03/2024" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Telefone</label>
+                                    <input type="text" class="input" value="(11) 99999-9999" readonly>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-handshake"></i>
-                            Vendas Internas
+                            <i class="fas fa-chart-line"></i>
+                            Estatísticas Pessoais
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Vendedores Internos</p>
-                        
-                        <div class="modules-list">
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-1')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
-                                    <i class="fas fa-play"></i>
+                        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                            <div class="stat-item" style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 12px;">
+                                <div style="font-size: 24px; font-weight: 700; color: var(--primary); margin-bottom: 4px;">1,890</div>
+                                <div style="font-size: 14px; color: var(--text-light);">Pontos Totais</div>
+                            </div>
+                            <div class="stat-item" style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 12px;">
+                                <div style="font-size: 24px; font-weight: 700; color: var(--success); margin-bottom: 4px;">8</div>
+                                <div style="font-size: 14px; color: var(--text-light);">Módulos Concluídos</div>
+                            </div>
+                            <div class="stat-item" style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 12px;">
+                                <div style="font-size: 24px; font-weight: 700; color: var(--warning); margin-bottom: 4px;">#3</div>
+                                <div style="font-size: 14px; color: var(--text-light);">Posição Ranking</div>
+                            </div>
+                            <div class="stat-item" style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 12px;">
+                                <div style="font-size: 24px; font-weight: 700; color: var(--secondary); margin-bottom: 4px;">12</div>
+                                <div style="font-size: 14px; color: var(--text-light);">Badges Conquistados</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card section-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-trophy"></i>
+                            Minhas Conquistas
+                        </h2>
+                        <div class="achievements-list">
+                            <div class="achievement-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px;">
+                                <div class="achievement-icon" style="width: 50px; height: 50px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
+                                    <i class="fas fa-graduation-cap"></i>
                                 </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">1. Vendas Consultivas</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Técnicas de venda baseadas em consultoria</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge badge-primary">Disponível</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+80 pontos</span>
-                                    </div>
+                                <div class="achievement-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Estudioso</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Concluiu 5 módulos de treinamento</p>
                                 </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Não iniciado</div>
+                                <div class="achievement-date" style="text-align: right;">
+                                    <div style="font-size: 12px; color: var(--text-light);">Conquistado em</div>
+                                    <div style="font-weight: 600;">15/11/2024</div>
                                 </div>
                             </div>
 
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-2')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-light); margin-right: 16px;">
-                                    <i class="fas fa-lock"></i>
+                            <div class="achievement-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px;">
+                                <div class="achievement-icon" style="width: 50px; height: 50px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
+                                    <i class="fas fa-phone"></i>
                                 </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">2. Atendimento Excepcional</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Como proporcionar uma experiência única ao cliente</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge" style="background: #f1f5f9; color: var(--text-light);">Bloqueado</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+90 pontos</span>
-                                    </div>
+                                <div class="achievement-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Comunicador</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Realizou 100 ligações</p>
                                 </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Bloqueado</div>
+                                <div class="achievement-date" style="text-align: right;">
+                                    <div style="font-size: 12px; color: var(--text-light);">Conquistado em</div>
+                                    <div style="font-weight: 600;">08/11/2024</div>
                                 </div>
                             </div>
+
+                            <div class="achievement-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px;">
+                                <div class="achievement-icon" style="width: 50px; height: 50px; background: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
+                                    <i class="fas fa-target"></i>
+                                </div>
+                                <div class="achievement-content" style="flex: 1;">
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Certeiro</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Bateu a meta 3 vezes seguidas</p>
+                                </div>
+                                <div class="achievement-date" style="text-align: right;">
+                                    <div style="font-size: 12px; color: var(--text-light);">Conquistado em</div>
+                                    <div style="font-weight: 600;">01/11/2024</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card section-card">
+                        <h2 class="section-title">
+                            <i class="fas fa-cog"></i>
+                            Configurações
+                        </h2>
+                        <div class="settings-list">
+                            <div class="setting-item" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border);">
+                                <div>
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Notificações por Email</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Receber atualizações por email</p>
+                                </div>
+                                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                                    <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); transition: .4s; border-radius: 24px; &:before { position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border);">
+                                <div>
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Notificações Push</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Notificações no navegador</p>
+                                </div>
+                                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                                    <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); transition: .4s; border-radius: 24px;"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border);">
+                                <div>
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Modo Escuro</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Tema escuro da interface</p>
+                                </div>
+                                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                                    <input type="checkbox" style="opacity: 0; width: 0; height: 0;">
+                                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px;"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0;">
+                                <div>
+                                    <h4 style="font-weight: 600; margin-bottom: 4px;">Relatórios Semanais</h4>
+                                    <p style="font-size: 14px; color: var(--text-light);">Receber resumo semanal</p>
+                                </div>
+                                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 24px;">
+                                    <input type="checkbox" checked style="opacity: 0; width: 0; height: 0;">
+                                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--primary); transition: .4s; border-radius: 24px;"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary">Salvar Configurações</button>
+                            <button class="btn btn-secondary">Alterar Senha</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="card section-card">
                     <h2 class="section-title">
-                        <i class="fas fa-book"></i>
-                        Biblioteca de Conteúdo
+                        <i class="fas fa-chart-area"></i>
+                        Progresso ao Longo do Tempo
                     </h2>
-                    <div class="library-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-alt" style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Artigos Especializados</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">45 artigos disponíveis</p>
-                        </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-video" style="font-size: 32px; color: var(--success); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Vídeos Educativos</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">23 vídeos disponíveis</p>
-                        </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-chart-line" style="font-size: 32px; color: var(--warning); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Cases de Sucesso</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">12 cases disponíveis</p>
-                        </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-download" style="font-size: 32px; color: var(--secondary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Templates e Scripts</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">18 templates disponíveis</p>
-                        </div>
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
                     </div>
-                </div>
-
-                <div class="card section-card">
-                    <h2 class="section-title">
-                        <i class="fas fa-comment"></i>
-                        Envie seu Feedback
-                    </h2>
-                    <form id="feedbackForm">
-                        <textarea id="feedbackText" class="input" placeholder="Escreva aqui" required style="margin-bottom:12px;"></textarea>
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                    </form>
-                    <div id="myFeedbacks" style="margin-top:16px;"></div>
                 </div>
             `;
         }
 
-        function getAdminDashboard() {
-            return getUserDashboard();
-        }
+        function getAdminContent() {
+            if (!['SUPER_ADMIN', 'ADMIN_OPERACIONAL', 'ADMIN_CONTEUDO', 'ADMIN_GAMIFICACAO'].includes(userRole)) {
+                return `
+                    <div class="card section-card text-center" style="padding: 64px;">
+                        <i class="fas fa-lock" style="font-size: 64px; color: var(--text-light); margin-bottom: 24px;"></i>
+                        <h2 style="margin-bottom: 16px;">Acesso Negado</h2>
+                        <p style="color: var(--text-light);">Você não tem permissão para acessar esta área.</p>
+                    </div>
+                `;
+            }
 
-        function getAcademiaContent() {
             return `
                 <div class="module-header">
                     <div>
-                        <h1 class="module-title">Academia de Treinamentos</h1>
-                        <p class="module-subtitle">Desenvolva suas habilidades com nossos módulos especializados</p>
+                        <h1 class="module-title">Painel Administrativo</h1>
+                        <p class="module-subtitle">Controle total sobre a plataforma</p>
                     </div>
-                    ${isAdmin() ? `
-                    <button class="btn btn-primary" onclick="openModal('addModuleModal')">
-                        <i class="fas fa-plus"></i>
-                        Novo Módulo
-                    </button>` : ''}
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary" onclick="openModal('addUserModal')">
+                            <i class="fas fa-user-plus"></i>
+                            Novo Usuário
+                        </button>
+                        <button class="btn btn-secondary" onclick="openModal('addCampaignModal')">
+                            <i class="fas fa-bullhorn"></i>
+                            Nova Campanha
+                        </button>
+                    </div>
                 </div>
 
-<form id="academia-form" style="margin:16px 0;">
-    <input type="hidden" id="academia-id">
-    <input id="academia-title" class="input" placeholder="Título" required>
-    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
-    <label style="display:block;margin:8px 0;">
-        <input type="checkbox" id="academia-active"> Ativo
-    </label>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-</form>
-<ul id="academia-list" class="modules-list"></ul>
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--primary);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>47</h3>
+                            <p>Usuários Ativos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--success);">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>16</h3>
+                            <p>Módulos Criados</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--warning);">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>8</h3>
+                            <p>Campanhas Ativas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card stat-card">
+                        <div class="stat-icon" style="background: var(--secondary);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>92%</h3>
+                            <p>Engajamento</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-user-tie"></i>
-                            SDR Mastery
+                            <i class="fas fa-users-cog"></i>
+                            Gestão de Usuários
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Sales Development Representatives</p>
+                        <div class="admin-actions" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                            <button class="btn btn-primary" onclick="loadAdminSection('users')">
+                                <i class="fas fa-users"></i>
+                                Gerenciar Usuários
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadAdminSection('roles')">
+                                <i class="fas fa-user-tag"></i>
+                                Permissões
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadAdminSection('teams')">
+                                <i class="fas fa-users"></i>
+                                Equipes
+                            </button>
+                        </div>
                         
-                        <div id="trainingModules" class="modules-list"></div>
+                        <div class="recent-users">
+                            <h4 style="margin-bottom: 16px;">Usuários Recentes</h4>
+                            <div class="user-list">
+                                <div class="user-item" style="display: flex; align-items: center; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;">
+                                    <div style="width: 40px; height: 40
+
+
+px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">JS</div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600;">João Silva</div>
+                                        <div style="font-size: 12px; color: var(--text-light);">SDR - Cadastrado hoje</div>
+                                    </div>
+                                    <span class="badge badge-success">Ativo</span>
+                                </div>
+                                <div class="user-item" style="display: flex; align-items: center; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;">
+                                    <div style="width: 40px; height: 40px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">MS</div>
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 600;">Maria Santos</div>
+                                        <div style="font-size: 12px; color: var(--text-light);">Vendedora - Cadastrada ontem</div>
+                                    </div>
+                                    <span class="badge badge-success">Ativo</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-handshake"></i>
-                            Vendas Internas
+                            <i class="fas fa-book"></i>
+                            Gestão de Conteúdo
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Vendedores Internos</p>
+                        <div class="admin-actions" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                            <button class="btn btn-primary" onclick="loadAdminSection('modules')">
+                                <i class="fas fa-graduation-cap"></i>
+                                Módulos
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadAdminSection('content')">
+                                <i class="fas fa-file-alt"></i>
+                                Conteúdo
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadAdminSection('library')">
+                                <i class="fas fa-book"></i>
+                                Biblioteca
+                            </button>
+                        </div>
                         
-                        <div class="modules-list">
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-1')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
-                                    <i class="fas fa-play"></i>
+                        <div class="content-stats">
+                            <h4 style="margin-bottom: 16px;">Estatísticas de Conteúdo</h4>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary);">16</div>
+                                    <div style="font-size: 12px; color: var(--text-light);">Módulos</div>
                                 </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">1. Vendas Consultivas</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Técnicas de venda baseadas em consultoria</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge badge-primary">Disponível</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+80 pontos</span>
-                                    </div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--success);">45</div>
+                                    <div style="font-size: 12px; color: var(--text-light);">Artigos</div>
                                 </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Não iniciado</div>
-                                </div>
-                            </div>
-
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-2')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-light); margin-right: 16px;">
-                                    <i class="fas fa-lock"></i>
-                                </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">2. Atendimento Excepcional</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Como proporcionar uma experiência única ao cliente</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge" style="background: #f1f5f9; color: var(--text-light);">Bloqueado</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+90 pontos</span>
-                                    </div>
-                                </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Bloqueado</div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--warning);">23</div>
+                                    <div style="font-size: 12px; color: var(--text-light);">Vídeos</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card section-card">
-                    <h2 class="section-title">
-                        <i class="fas fa-book"></i>
-                        Biblioteca de Conteúdo
-                    </h2>
-                    <div class="library-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-alt" style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Artigos Especializados</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">45 artigos disponíveis</p>
-                        </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-video" style="font-size: 32px; color: var(--success); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Vídeos Educativos</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">23 vídeos disponíveis</p>
-                        </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-chart-line" style="font-size: 32px; color: var(--warning); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Cases de Sucesso</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">12 cases disponíveis</p>
-                        </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-download" style="font-size: 32px; color: var(--secondary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Templates e Scripts</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">18 templates disponíveis</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card section-card">
-                    <h2 class="section-title">
-                        <i class="fas fa-comment"></i>
-                        Envie seu Feedback
-                    </h2>
-                    <form id="feedbackForm">
-                        <textarea id="feedbackText" class="input" placeholder="Escreva aqui" required style="margin-bottom:12px;"></textarea>
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                    </form>
-                    <div id="myFeedbacks" style="margin-top:16px;"></div>
-                </div>
-            `;
-        }
-
-        function getAdminDashboard() {
-            return getUserDashboard();
-        }
-
-        function getAcademiaContent() {
-            return `
-                <div class="module-header">
-                    <div>
-                        <h1 class="module-title">Academia de Treinamentos</h1>
-                        <p class="module-subtitle">Desenvolva suas habilidades com nossos módulos especializados</p>
-                    </div>
-                    ${isAdmin() ? `
-                    <button class="btn btn-primary" onclick="openModal('addModuleModal')">
-                        <i class="fas fa-plus"></i>
-                        Novo Módulo
-                    </button>` : ''}
-                </div>
-
-<form id="academia-form" style="margin:16px 0;">
-    <input type="hidden" id="academia-id">
-    <input id="academia-title" class="input" placeholder="Título" required>
-    <input id="academia-order" class="input" type="number" placeholder="Ordem" required>
-    <label style="display:block;margin:8px 0;">
-        <input type="checkbox" id="academia-active"> Ativo
-    </label>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-</form>
-<ul id="academia-list" class="modules-list"></ul>
                 <div class="dashboard-grid">
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-user-tie"></i>
-                            SDR Mastery
+                            <i class="fas fa-gamepad"></i>
+                            Gestão de Gamificação
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Sales Development Representatives</p>
+                        <div class="admin-actions" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                            <button class="btn btn-primary" onclick="loadAdminSection('badges')">
+                                <i class="fas fa-medal"></i>
+                                Badges
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadAdminSection('challenges')">
+                                <i class="fas fa-trophy"></i>
+                                Desafios
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadAdminSection('rewards')">
+                                <i class="fas fa-gift"></i>
+                                Recompensas
+                            </button>
+                        </div>
                         
-                        <div id="trainingModules" class="modules-list"></div>
+                        <div class="gamification-stats">
+                            <h4 style="margin-bottom: 16px;">Estatísticas de Gamificação</h4>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary);">12</div>
+                                    <div style="font-size: 12px; color: var(--text-light);">Badges Ativas</div>
+                                </div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--success);">8</div>
+                                    <div style="font-size: 12px; color: var(--text-light);">Desafios Ativos</div>
+                                </div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--warning);">15</div>
+                                    <div style="font-size: 12px; color: var(--text-light);">Recompensas</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card section-card">
                         <h2 class="section-title">
-                            <i class="fas fa-handshake"></i>
-                            Vendas Internas
+                            <i class="fas fa-chart-bar"></i>
+                            Analytics e Relatórios
                         </h2>
-                        <p style="color: var(--text-light); margin-bottom: 24px;">Módulos especializados para Vendedores Internos</p>
+                        <div class="admin-actions" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                            <button class="btn btn-primary" onclick="loadAdminSection('analytics')">
+                                <i class="fas fa-chart-line"></i>
+                                Analytics
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadAdminSection('reports')">
+                                <i class="fas fa-file-alt"></i>
+                                Relatórios
+                            </button>
+                            <button class="btn btn-secondary" onclick="loadAdminSection('exports')">
+                                <i class="fas fa-download"></i>
+                                Exportar Dados
+                            </button>
+                        </div>
                         
-                        <div class="modules-list">
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-1')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 16px;">
-                                    <i class="fas fa-play"></i>
+                        <div class="analytics-preview">
+                            <h4 style="margin-bottom: 16px;">Resumo Semanal</h4>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                                <div style="padding: 16px; background: #f0f9ff; border-radius: 8px;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--primary); margin-bottom: 4px;">+15%</div>
+                                    <div style="font-size: 12px; color: var(--text-light);">Engajamento</div>
                                 </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">1. Vendas Consultivas</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Técnicas de venda baseadas em consultoria</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge badge-primary">Disponível</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+80 pontos</span>
-                                    </div>
-                                </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Não iniciado</div>
-                                </div>
-                            </div>
-
-                            <div class="module-item" style="display: flex; align-items: center; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" onclick="openModule('vendas-2')">
-                                <div class="module-icon" style="width: 50px; height: 50px; background: var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-light); margin-right: 16px;">
-                                    <i class="fas fa-lock"></i>
-                                </div>
-                                <div class="module-content" style="flex: 1;">
-                                    <h4 style="font-weight: 600; margin-bottom: 4px;">2. Atendimento Excepcional</h4>
-                                    <p style="font-size: 14px; color: var(--text-light); margin-bottom: 8px;">Como proporcionar uma experiência única ao cliente</p>
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <span class="badge" style="background: #f1f5f9; color: var(--text-light);">Bloqueado</span>
-                                        <span style="font-size: 12px; color: var(--text-light);">+90 pontos</span>
-                                    </div>
-                                </div>
-                                <div class="module-progress" style="text-align: right;">
-                                    <div style="font-size: 24px; font-weight: 700; color: var(--text-light);">0%</div>
-                                    <div style="font-size: 12px; color: var(--text-light);">Bloqueado</div>
+                                <div style="padding: 16px; background: #f0fdf4; border-radius: 8px;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--success); margin-bottom: 4px;">+8</div>
+                                    <div style="font-size: 12px; color: var(--text-light);">Novos Usuários</div>
                                 </div>
                             </div>
                         </div>
@@ -1460,43 +1815,31 @@ function loadAdmin() {
 
                 <div class="card section-card">
                     <h2 class="section-title">
-                        <i class="fas fa-book"></i>
-                        Biblioteca de Conteúdo
+                        <i class="fas fa-cogs"></i>
+                        Configurações do Sistema
                     </h2>
-                    <div class="library-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-alt" style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Artigos Especializados</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">45 artigos disponíveis</p>
+                    <div class="system-settings" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                        <div class="setting-card card" style="padding: 20px; text-align: center; cursor: pointer;" onclick="loadAdminSection('general-settings')">
+                            <i class="fas fa-cog" style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"></i>
+                            <h4 style="margin-bottom: 8px;">Configurações Gerais</h4>
+                            <p style="font-size: 14px; color: var(--text-light);">Configurações básicas da plataforma</p>
                         </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-video" style="font-size: 32px; color: var(--success); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Vídeos Educativos</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">23 vídeos disponíveis</p>
+                        <div class="setting-card card" style="padding: 20px; text-align: center; cursor: pointer;" onclick="loadAdminSection('email-settings')">
+                            <i class="fas fa-envelope" style="font-size: 32px; color: var(--success); margin-bottom: 12px;"></i>
+                            <h4 style="margin-bottom: 8px;">Configurações de Email</h4>
+                            <p style="font-size: 14px; color: var(--text-light);">SMTP e templates de email</p>
                         </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-chart-line" style="font-size: 32px; color: var(--warning); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Cases de Sucesso</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">12 cases disponíveis</p>
+                        <div class="setting-card card" style="padding: 20px; text-align: center; cursor: pointer;" onclick="loadAdminSection('security-settings')">
+                            <i class="fas fa-shield-alt" style="font-size: 32px; color: var(--warning); margin-bottom: 12px;"></i>
+                            <h4 style="margin-bottom: 8px;">Segurança</h4>
+                            <p style="font-size: 14px; color: var(--text-light);">Configurações de segurança</p>
                         </div>
-                        <div class="library-item card" style="padding: 20px; text-align: center; cursor: pointer;">
-                            <i class="fas fa-file-download" style="font-size: 32px; color: var(--secondary); margin-bottom: 12px;"></i>
-                            <h4 style="margin-bottom: 8px;">Templates e Scripts</h4>
-                            <p style="font-size: 14px; color: var(--text-light);">18 templates disponíveis</p>
+                        <div class="setting-card card" style="padding: 20px; text-align: center; cursor: pointer;" onclick="loadAdminSection('backup-settings')">
+                            <i class="fas fa-database" style="font-size: 32px; color: var(--secondary); margin-bottom: 12px;"></i>
+                            <h4 style="margin-bottom: 8px;">Backup</h4>
+                            <p style="font-size: 14px; color: var(--text-light);">Backup e restauração</p>
                         </div>
                     </div>
-                </div>
-
-                <div class="card section-card">
-                    <h2 class="section-title">
-                        <i class="fas fa-comment"></i>
-                        Envie seu Feedback
-                    </h2>
-                    <form id="feedbackForm">
-                        <textarea id="feedbackText" class="input" placeholder="Escreva aqui" required style="margin-bottom:12px;"></textarea>
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                    </form>
-                    <div id="myFeedbacks" style="margin-top:16px;"></div>
                 </div>
             `;
         }
@@ -1525,8 +1868,6 @@ function loadAdmin() {
                     initAdminScripts();
                     break;
             }
-
-            if (page === 'academia') initAcademiaModule();
         }
 
         function initDashboardCharts() {
@@ -1782,67 +2123,18 @@ function loadAdmin() {
             // Implementar lógica de carregamento da seção
         }
 
-        async function initAcademiaModule() {
-            const form = document.getElementById('academia-form');
-            const list = document.getElementById('academia-list');
-            const col = db.collection('academyModules').orderBy('order');
-
-            // 1) Render em tempo real
-            col.onSnapshot(snap => {
-                list.innerHTML = '';
-                snap.forEach(doc => renderAcademiaItem(doc));
-            });
-
-            // 2) Submit (create/update)
-            form.addEventListener('submit', async e => {
-                e.preventDefault();
-                await saveAcademia({
-                    id: form.elements['academia-id'].value || null,
-                    title: form.elements['academia-title'].value,
-                    order: parseInt(form.elements['academia-order'].value, 10) || 0,
-                    active: form.elements['academia-active'].checked
-                });
-                form.reset();
-            });
-        }
-
-        function renderAcademiaItem(doc) {
-            const data = doc.data();
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <span>${data.title}</span>
-                <div>
-                    <button class="btn btn-secondary btn-edit"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-danger btn-delete"><i class="fas fa-trash"></i></button>
-                </div>`;
-            li.querySelector('.btn-edit').addEventListener('click', () => {
-                document.getElementById('academia-id').value = doc.id;
-                document.getElementById('academia-title').value = data.title;
-                document.getElementById('academia-order').value = data.order;
-                document.getElementById('academia-active').checked = data.active;
-            });
-            li.querySelector('.btn-delete').addEventListener('click', async () => {
-                if (confirm('Excluir módulo?')) {
-                    await db.collection('academyModules').doc(doc.id).delete();
-                }
-            });
-            const list = document.getElementById('academia-list');
-            if (list) list.appendChild(li);
-        }
-
-        async function saveAcademia({ id, title, order, active }) {
-            const data = { title, order, active };
-            if (id) {
-                await fsUpdate('academyModules', id, { ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-            } else {
-                await fsAdd('academyModules', { ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-            }
-        }
-
         // Inicialização da aplicação
         document.addEventListener('DOMContentLoaded', () => {
             showNotification('Aplicação iniciada', 'success');
 
+            // Verificar se há usuário logado
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    showNotification('Usuário logado: ' + user.email, 'success');
+                } else {
+                    showNotification('Usuário não logado', 'info');
+                }
+            });
 
             const prospectForm = document.getElementById('addProspectForm');
             if (prospectForm) {
@@ -2107,22 +2399,22 @@ function loadAdmin() {
 
         // Sistema de notificações em tempo real
         function initRealtimeNotifications() {
-  if (!currentUser) return;
-
-  try {
-    db.collection('notifications')
-      .where('userId', '==', currentUser.uid)
-      .where('read', '==', false)
-      .onSnapshot(snapshot => {
-        // … seu código de notificação …
-      });
-  } catch (err) {
-    console.warn(
-      'Não foi possível iniciar notificações em tempo real:',
-      err.message
-    );
-  }
-}
+            if (!currentUser) return;
+            
+            db.collection('notifications')
+                .where('userId', '==', currentUser.uid)
+                .where('read', '==', false)
+                .onSnapshot((snapshot) => {
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const notification = change.doc.data();
+                            showNotification(notification.message, notification.type);
+                        }
+                    });
+                }, err => {
+                    console.error('Erro em notificações em tempo real:', err);
+                });
+        }
 
         // Inicializar notificações em tempo real quando o usuário fizer login
         auth.onAuthStateChanged((user) => {
@@ -2173,7 +2465,7 @@ function loadAdmin() {
         // Configurações de PWA (Progressive Web App)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.register('/sw.js')
                     .then((registration) => {
                         showNotification('PWA ativo', 'success');
                     })
@@ -2446,4 +2738,4 @@ function loadAdmin() {
 
         showNotification('Plataforma Embalagens Conceito - Versão 1.0.0', 'info');
         showNotification('Desenvolvida com ❤️ para a equipe de vendas', 'info');
-
+    
