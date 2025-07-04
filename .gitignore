@@ -67,3 +67,7 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# Ignorar o binário standalone do Tailwind
+tailwindcss.exe
+tailwindcss.exe.exe
