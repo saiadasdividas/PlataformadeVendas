@@ -1493,15 +1493,15 @@ function navigateTo(page) {
                         <h1 class="module-title">Painel Administrativo</h1>
                         <p class="module-subtitle">Controle total sobre a plataforma</p>
                     </div>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn btn-primary" onclick="openModal('addUserModal')">
-                            <i class="fas fa-user-plus"></i>
-                            Novo Usuário
-                        </button>
-                        <button class="btn btn-secondary" onclick="openModal('addCampaignModal')">
-                            <i class="fas fa-bullhorn"></i>
-                            Nova Campanha
-                        </button>
+                    <div class="actions">
+                      <button id="btnNewUser" class="btn-primary flex items-center space-x-2" type="button">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Novo Usuário</span>
+                      </button>
+                      <button id="btnNewCampaign" class="btn-secondary flex items-center space-x-2" type="button">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>Nova Campanha</span>
+                      </button>
                     </div>
                 </div>
 
@@ -2077,32 +2077,36 @@ function navigateTo(page) {
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   console.log('✅ DOM carregado — iniciando listeners');
 
-  const btnNewUser = document.getElementById('btnNewUser');
-  console.log('🔍 btnNewUser:', btnNewUser);
+  const btnNewUser       = document.getElementById('btnNewUser');
+  const newUserModal     = document.getElementById('newUserModal');
+  const closeNewUserBtn  = document.getElementById('closeNewUserModal');
+  const cancelNewUserBtn = document.getElementById('cancelNewUser');
+  const newUserForm      = document.getElementById('newUserForm');
 
-  const newUserModal = document.getElementById('newUserModal');
-  console.log('🔍 newUserModal:', newUserModal);
+  if (btnNewUser && newUserModal && closeNewUserBtn && cancelNewUserBtn && newUserForm) {
+    btnNewUser.addEventListener('click', () => {
+      console.log('👆 Clique em Novo Usuário detectado');
+      newUserModal.classList.remove('hidden');
+    });
 
-  if (!btnNewUser) {
-    console.error('❌ Botão Novo Usuário não encontrado!');
-    return;
+    [closeNewUserBtn, cancelNewUserBtn].forEach(btn =>
+      btn.addEventListener('click', () => {
+        newUserModal.classList.add('hidden');
+        newUserForm.reset();
+      })
+    );
+
+    newUserForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      // … lógia de criação de usuário …
+    });
   }
-  if (!newUserModal) {
-    console.error('❌ Modal Novo Usuário não encontrado!');
-    return;
-  }
-
-  console.log('🔗 Registrando listener para botão de Novo Usuário');
-  btnNewUser.addEventListener('click', () => {
-    console.log('👆 Clique em Novo Usuário detectado');
-    newUserModal.classList.remove('hidden');
-  });
 });
 
-        // Funções de utilidade
+// Funções de utilidade
         function formatCurrency(value) {
             return new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
