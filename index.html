@@ -17,6 +17,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
    
+  <!-- Removido os scripts do head para o final do body -->
 </head>
 <body>
   
@@ -218,7 +219,17 @@
         </form>
       </div>
     </div>
- <script src="config.js"></script>
-<script src="main.js"></script>
+    <!-- Botão Novo Usuário -->
+    <button
+      id="btnNewUser"
+      class="btn-primary flex items-center space-x-2"
+    >
+      <i class="fas fa-user-plus"></i>
+      <span>Novo Usuário</span>
+    </button>
+
+  <!-- Scripts -->
+  <script src="config.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
