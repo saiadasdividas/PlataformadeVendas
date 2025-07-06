@@ -2077,22 +2077,30 @@ function navigateTo(page) {
             }
         });
 
-        // Captura o botão pelo ID
-        const btnNewUser = document.getElementById('btnNewUser');
-        const newUserModal = document.getElementById('newUserModal');
+        document.addEventListener('DOMContentLoaded', () => {
+  console.log('✅ DOM carregado — iniciando listeners');
 
-        if (!newUserModal) {
-          console.error('Modal Novo Usuário não encontrado no DOM!');
-        }
+  const btnNewUser = document.getElementById('btnNewUser');
+  console.log('🔍 btnNewUser:', btnNewUser);
 
-        if (!btnNewUser) {
-          console.error('Botão Novo Usuário não encontrado no DOM!');
-        } else {
-          btnNewUser.addEventListener('click', () => {
-            console.log('Clique em Novo Usuário detectado');
-            newUserModal.classList.remove('hidden');
-          });
-        }
+  const newUserModal = document.getElementById('newUserModal');
+  console.log('🔍 newUserModal:', newUserModal);
+
+  if (!btnNewUser) {
+    console.error('❌ Botão Novo Usuário não encontrado!');
+    return;
+  }
+  if (!newUserModal) {
+    console.error('❌ Modal Novo Usuário não encontrado!');
+    return;
+  }
+
+  console.log('🔗 Registrando listener para botão de Novo Usuário');
+  btnNewUser.addEventListener('click', () => {
+    console.log('👆 Clique em Novo Usuário detectado');
+    newUserModal.classList.remove('hidden');
+  });
+});
 
         // Funções de utilidade
         function formatCurrency(value) {
