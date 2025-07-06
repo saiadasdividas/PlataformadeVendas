@@ -1204,7 +1204,7 @@ function navigateTo(page) {
                                 <div style="background: var(--primary); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Comunicação Clientes
                                 </div>
-                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Stories WhatsApp
                                 </div>
                             </div>
@@ -1215,7 +1215,7 @@ function navigateTo(page) {
                                 <div style="background: var(--warning); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Stories Instagram
                                 </div>
-                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Ligações Clientes
                                 </div>
                             </div>
@@ -1226,7 +1226,7 @@ function navigateTo(page) {
                                 <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Stories WhatsApp
                                 </div>
-                                <div style="background: var(--primary); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                <div style="background: var(--primary); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Manutenção Site
                                 </div>
                             </div>
@@ -1237,7 +1237,7 @@ function navigateTo(page) {
                                 <div style="background: var(--warning); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Stories Instagram
                                 </div>
-                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Envio PDFs
                                 </div>
                             </div>
@@ -1248,7 +1248,7 @@ function navigateTo(page) {
                                 <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Stories WhatsApp
                                 </div>
-                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
+                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Relatório Semanal
                                 </div>
                             </div>
