@@ -181,158 +181,16 @@ function navigateTo(page) {
 }
 
 // Função loadUserData (adicione se não existir)
-async function loadUserData() {
-    try {
-        const userDoc = await db.collection('users').doc(currentUser.uid).get();
-        if (userDoc.exists) {
-            const userData = userDoc.data();
-            userRole = userData.profile?.role || 'USER';
-            // Atualizar UI com dados do usuário
-            document.getElementById('userName').textContent = userData.profile?.name || currentUser.email;
-            document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
-            document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
-            renderMenuForRole(userRole);
-        } else {
-            // Criar perfil padrão se não existir
-            await createDefaultUserProfile();
-        }
-    } catch (error) {
-        console.error('Erro ao carregar dados do usuário:', error);
-    }
-}
-
-async function createDefaultUserProfile() {
-    const defaultProfile = {
-        profile: {
-            name: currentUser.displayName || currentUser.email,
-            email: currentUser.email,
-            role: 'USER',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        },
-        stats: {
-            totalPoints: 0,
-            level: 1,
-            badges: [],
-            achievements: []
-        }
-    };
-
-    await db.collection('users').doc(currentUser.uid).set(defaultProfile);
-    userRole = 'USER';
-}
-
-async function updateUserProfile(uid, profileData) {
-    if (!isAdmin()) {
-        throw new Error('Permissão negada');
-    }
-
-    await fsUpdate('users', uid, {
-        profile: {
-            ...profileData,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }
-    });
-}
-
-function loadPage(page) {
-    console.log('Carregando página:', page);
-    
-    // Atualizar título da página
-    const pageTitle = document.getElementById('pageTitle');
-    if (pageTitle) {
-        pageTitle.textContent = page.charAt(0).toUpperCase() + page.slice(1);
-    }
-    
-    // Aqui você pode adicionar a lógica específica para carregar cada página
-    switch (page) {
-        case 'dashboard':
-            loadDashboard();
-            break;
-        case 'academia':
-            loadAcademia();
-            break;
-        case 'gamificacao':
-            loadGamificacao();
-            break;
-        case 'crm':
-            loadCRM();
-            break;
-        case 'mr-representacoes':
-            loadMRRepresentacoes();
-            break;
-        case 'perfil':
-            loadPerfil();
-            break;
-        case 'admin':
-            loadAdmin();
-            break;
-        default:
-            loadDashboard();
-    }
-}
-
-// Placeholder functions para as páginas (substitua pela sua lógica real)
-function loadDashboard() {
-    const contentArea = document.getElementById('contentArea');
-    if (contentArea) {
-        contentArea.innerHTML = '<h2>Dashboard</h2><p>Bem-vindo ao dashboard!</p>';
-    }
-}
-
-function loadAcademia() {
-    const contentArea = document.getElementById('contentArea');
-    if (contentArea) {
-        contentArea.innerHTML = '<h2>Academia</h2><p>Área de treinamento e aprendizado.</p>';
-    }
-}
-
-function loadGamificacao() {
-    const contentArea = document.getElementById('contentArea');
-    if (contentArea) {
-        contentArea.innerHTML = '<h2>Gamificação</h2><p>Sistema de pontuação e recompensas.</p>';
-    }
-}
-
-function loadCRM() {
-    const contentArea = document.getElementById('contentArea');
-    if (contentArea) {
-        contentArea.innerHTML = '<h2>CRM & Vendas</h2><p>Gerenciamento de relacionamento com clientes.</p>';
-    }
-}
-
-function loadMRRepresentacoes() {
-    const contentArea = document.getElementById('contentArea');
-    if (contentArea) {
-        contentArea.innerHTML = '<h2>MR Representações</h2><p>Área específica para representantes.</p>';
-    }
-}
-
-function loadPerfil() {
-    const contentArea = document.getElementById('contentArea');
-    if (contentArea) {
-        contentArea.innerHTML = '<h2>Perfil</h2><p>Informações do seu perfil.</p>';
-    }
-}
-
-function loadAdmin() {
-    const contentArea = document.getElementById('contentArea');
-    if (contentArea) {
-        contentArea.innerHTML = '<h2>Administração</h2><p>Área administrativa do sistema.</p>';
-    }
-}
-
         async function loadUserData() {
             try {
                 const userDoc = await db.collection('users').doc(currentUser.uid).get();
                 if (userDoc.exists) {
                     const userData = userDoc.data();
                     userRole = userData.profile?.role || 'USER';
-                    
                     // Atualizar UI com dados do usuário
                     document.getElementById('userName').textContent = userData.profile?.name || currentUser.email;
                     document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
                     document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
-                    
                     renderMenuForRole(userRole);
                 } else {
                     // Criar perfil padrão se não existir
