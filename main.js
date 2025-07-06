@@ -2077,6 +2077,23 @@ function navigateTo(page) {
             }
         });
 
+        // Captura o botão pelo ID
+        const btnNewUser = document.getElementById('btnNewUser');
+        const newUserModal = document.getElementById('newUserModal');
+
+        if (!newUserModal) {
+          console.error('Modal Novo Usuário não encontrado no DOM!');
+        }
+
+        if (!btnNewUser) {
+          console.error('Botão Novo Usuário não encontrado no DOM!');
+        } else {
+          btnNewUser.addEventListener('click', () => {
+            console.log('Clique em Novo Usuário detectado');
+            newUserModal.classList.remove('hidden');
+          });
+        }
+
         // Funções de utilidade
         function formatCurrency(value) {
             return new Intl.NumberFormat('pt-BR', {
