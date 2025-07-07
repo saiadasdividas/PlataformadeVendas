@@ -59,8 +59,12 @@ function renderMenuForRole(role) {
             navigateTo(page);
         });
         
-        menu.appendChild(a);
-    });
+    menu.appendChild(a);
+  });
+}
+
+function configureMenu() {
+    renderMenuForRole(userRole);
 }
 
 // Elementos DOM
@@ -2164,6 +2168,47 @@ function loadAdmin() {
             }
 
             const feedbackForm = document.getElementById('feedbackForm');
+            const userForm = document.getElementById('addUserForm');
+            if (userForm) {
+                userForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+
+                        const createUser = firebase
+                            .app()
+                            .functions('us-central1')
+                            .httpsCallable('createUser');
+                        await createUser({
+                            email: document.getElementById('newUserEmail').value,
+                            password: document.getElementById('newUserPassword').value,
+                            displayName: document.getElementById('newUserName').value,
+                            role: document.getElementById('newUserRole').value
+                        });
+                        userForm.reset();
+                        closeModal('addUserModal');
+                        showNotification('Usuário criado com sucesso', 'success');
+                    } catch (err) {
+                        console.error('Erro ao criar usuário', err);
+                        showNotification('Erro ao criar usuário', 'error');
+                    }
+                });
+            }
+
+            const campaignForm = document.getElementById('addCampaignForm');
+            if (campaignForm) {
+                campaignForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await db.collection('campaigns').add({
+                        name: document.getElementById('campaignName').value,
+                        description: document.getElementById('campaignDescription').value,
+                        goal: parseFloat(document.getElementById('campaignGoal').value),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    campaignForm.reset();
+                    closeModal('addCampaignModal');
+                    showNotification('Campanha criada', 'success');
+                });
+            }
             if (feedbackForm) {
                 feedbackForm.addEventListener('submit', async (e) => {
                     e.preventDefault();

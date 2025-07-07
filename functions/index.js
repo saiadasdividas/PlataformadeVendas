@@ -84,22 +84,52 @@ exports.updateUserRole = onCall(
   },
 );
 
-// Função callable para criar usuário
+// Função callable para criação de usuários por administradores
 exports.createUser = onCall(
-  { region: 'us-central1' },
-  async (data, context) => {
-    const { email, password } = data;
+  {
+    region: "us-central1",
+    cors: true,
+  },
+  async (req) => {
+    const callerRole = req.auth && req.auth.token ? req.auth.token.role : null;
+    if (callerRole !== "SUPER_ADMIN") {
+      throw new HttpsError("permission-denied", "Acesso negado");
+    }
+
+    const {email, password, displayName = "", role = "USER"} = req.data;
+    const validRoles = [
+      "SUPER_ADMIN",
+      "USER_SDR",
+      "USER_VENDEDOR",
+      "MR_RESPONSAVEL",
+      "ADMIN_OPERACIONAL",
+      "ADMIN_CONTEUDO",
+      "ADMIN_GAMIFICACAO",
+      "USER",
+    ];
+    if (!validRoles.includes(role)) {
+      throw new HttpsError("invalid-argument", "Role inválida");
+    }
+
     try {
-      const userRecord = await getAuth().createUser({ email, password });
-      return { uid: userRecord.uid };
+      const user = await getAuth().createUser({email, password, displayName});
+      await getAuth().setCustomUserClaims(user.uid, {role});
+      await getFirestore().collection("users").doc(user.uid).set({
+        email,
+        displayName,
+        role,
+        createdAt: FieldValue.serverTimestamp(),
+        isActive: true,
+      });
+      return {uid: user.uid};
     } catch (err) {
-      console.error('Erro em createUser:', err);
-      throw new HttpsError('internal', err.message);
+      console.error("Erro em createUser:", err);
+      throw new HttpsError("internal", err.message);
     }
   },
 );
 
-// Função HTTP para criar usuário com CORS (já integrada ao index.js principal)
+// Função HTTP para criar usuário com CORS (opcional, se quiser expor via HTTP)
 exports.createUserHttp = functions
   .region('us-central1')
   .https.onRequest((req, res) => {
@@ -108,11 +138,32 @@ exports.createUserHttp = functions
         return res.status(405).send('Método não permitido');
       }
       try {
-        const { email, password } = req.body;
-        const userRecord = await admin.auth().createUser({ email, password });
-        return res.json({ uid: userRecord.uid });
+        const { email, password, displayName = '', role = 'USER' } = req.body;
+        const validRoles = [
+          'SUPER_ADMIN',
+          'USER_SDR',
+          'USER_VENDEDOR',
+          'MR_RESPONSAVEL',
+          'ADMIN_OPERACIONAL',
+          'ADMIN_CONTEUDO',
+          'ADMIN_GAMIFICACAO',
+          'USER',
+        ];
+        if (!validRoles.includes(role)) {
+          return res.status(400).json({ error: 'Role inválida' });
+        }
+        const user = await admin.auth().createUser({ email, password, displayName });
+        await admin.auth().setCustomUserClaims(user.uid, { role });
+        await admin.firestore().collection('users').doc(user.uid).set({
+          email,
+          displayName,
+          role,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          isActive: true,
+        });
+        return res.json({ uid: user.uid });
       } catch (err) {
-        console.error(err);
+        console.error('Erro em createUserHttp:', err);
         return res.status(500).json({ error: err.message });
       }
     });
