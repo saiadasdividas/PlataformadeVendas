@@ -1,4 +1,4 @@
-// Configuração do Firebase em arquivo externo config.js
+        // Configuração do Firebase em arquivo externo config.js
 
 // Inicializar Firebase
 const auth = firebase.auth();
@@ -181,17 +181,120 @@ function navigateTo(page) {
 }
 
 // Função loadUserData (adicione se não existir)
+async function loadUserData() {
+    try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            console.log('Dados do usuário carregados:', userData);
+            // Aqui você pode processar os dados do usuário conforme necessário
+        }
+    } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+    }
+}
+
+// Função loadPage (adicione se não existir)
+function loadPage(page) {
+    console.log('Carregando página:', page);
+    
+    // Atualizar título da página
+    const pageTitle = document.getElementById('pageTitle');
+    if (pageTitle) {
+        pageTitle.textContent = page.charAt(0).toUpperCase() + page.slice(1);
+    }
+    
+    // Aqui você pode adicionar a lógica específica para carregar cada página
+    switch (page) {
+        case 'dashboard':
+            loadDashboard();
+            break;
+        case 'academia':
+            loadAcademia();
+            break;
+        case 'gamificacao':
+            loadGamificacao();
+            break;
+        case 'crm':
+            loadCRM();
+            break;
+        case 'mr-representacoes':
+            loadMRRepresentacoes();
+            break;
+        case 'perfil':
+            loadPerfil();
+            break;
+        case 'admin':
+            loadAdmin();
+            break;
+        default:
+            loadDashboard();
+    }
+}
+
+// Placeholder functions para as páginas (substitua pela sua lógica real)
+function loadDashboard() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Dashboard</h2><p>Bem-vindo ao dashboard!</p>';
+    }
+}
+
+function loadAcademia() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Academia</h2><p>Área de treinamento e aprendizado.</p>';
+    }
+}
+
+function loadGamificacao() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Gamificação</h2><p>Sistema de pontuação e recompensas.</p>';
+    }
+}
+
+function loadCRM() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>CRM & Vendas</h2><p>Gerenciamento de relacionamento com clientes.</p>';
+    }
+}
+
+function loadMRRepresentacoes() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>MR Representações</h2><p>Área específica para representantes.</p>';
+    }
+}
+
+function loadPerfil() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Perfil</h2><p>Informações do seu perfil.</p>';
+    }
+}
+
+function loadAdmin() {
+    const contentArea = document.getElementById('contentArea');
+    if (contentArea) {
+        contentArea.innerHTML = '<h2>Administração</h2><p>Área administrativa do sistema.</p>';
+    }
+}
+
         async function loadUserData() {
             try {
                 const userDoc = await db.collection('users').doc(currentUser.uid).get();
                 if (userDoc.exists) {
                     const userData = userDoc.data();
                     userRole = userData.profile?.role || 'USER';
+                    
                     // Atualizar UI com dados do usuário
                     document.getElementById('userName').textContent = userData.profile?.name || currentUser.email;
                     document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
                     document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
-                    renderMenuForRole(userRole);
+                    
+                    configureMenu();
                 } else {
                     // Criar perfil padrão se não existir
                     await createDefaultUserProfile();
@@ -1204,7 +1307,7 @@ function navigateTo(page) {
                                 <div style="background: var(--primary); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Comunicação Clientes
                                 </div>
-                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
                                     Stories WhatsApp
                                 </div>
                             </div>
@@ -1215,7 +1318,7 @@ function navigateTo(page) {
                                 <div style="background: var(--warning); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Stories Instagram
                                 </div>
-                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
                                     Ligações Clientes
                                 </div>
                             </div>
@@ -1226,7 +1329,7 @@ function navigateTo(page) {
                                 <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Stories WhatsApp
                                 </div>
-                                <div style="background: var(--primary); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                <div style="background: var(--primary); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
                                     Manutenção Site
                                 </div>
                             </div>
@@ -1237,7 +1340,7 @@ function navigateTo(page) {
                                 <div style="background: var(--warning); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Stories Instagram
                                 </div>
-                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
                                     Envio PDFs
                                 </div>
                             </div>
@@ -1248,7 +1351,7 @@ function navigateTo(page) {
                                 <div style="background: var(--success); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
                                     Stories WhatsApp
                                 </div>
-                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px; margin-bottom: 8px;">
+                                <div style="background: var(--secondary); color: white; padding: 8px; border-radius: 8px; font-size: 12px;">
                                     Relatório Semanal
                                 </div>
                             </div>
@@ -1493,15 +1596,15 @@ function navigateTo(page) {
                         <h1 class="module-title">Painel Administrativo</h1>
                         <p class="module-subtitle">Controle total sobre a plataforma</p>
                     </div>
-                    <div class="actions">
-                      <button id="btnNewUser" class="btn-primary flex items-center space-x-2" type="button">
-                        <i class="fas fa-user-plus"></i>
-                        <span>Novo Usuário</span>
-                      </button>
-                      <button id="btnNewCampaign" class="btn-secondary flex items-center space-x-2" type="button">
-                        <i class="fas fa-bullhorn"></i>
-                        <span>Nova Campanha</span>
-                      </button>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary" onclick="openModal('addUserModal')">
+                            <i class="fas fa-user-plus"></i>
+                            Novo Usuário
+                        </button>
+                        <button class="btn btn-secondary" onclick="openModal('addCampaignModal')">
+                            <i class="fas fa-bullhorn"></i>
+                            Nova Campanha
+                        </button>
                     </div>
                 </div>
 
@@ -1572,7 +1675,10 @@ function navigateTo(page) {
                             <h4 style="margin-bottom: 16px;">Usuários Recentes</h4>
                             <div class="user-list">
                                 <div class="user-item" style="display: flex; align-items: center; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;">
-                                    <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">JS</div>
+                                    <div style="width: 40px; height: 40
+
+
+px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">JS</div>
                                     <div style="flex: 1;">
                                         <div style="font-weight: 600;">João Silva</div>
                                         <div style="font-size: 12px; color: var(--text-light);">SDR - Cadastrado hoje</div>
@@ -1614,16 +1720,16 @@ function navigateTo(page) {
                         <div class="content-stats">
                             <h4 style="margin-bottom: 16px;">Estatísticas de Conteúdo</h4>
                             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                                <div style="padding: 16px; background: #f0f9ff; border-radius: 8px;">
-                                    <div style="font-size: 16px; font-weight: 600; color: var(--primary); margin-bottom: 4px;">16</div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary);">16</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Módulos</div>
                                 </div>
-                                <div style="padding: 16px; background: #f0fdf4; border-radius: 8px;">
-                                    <div style="font-size: 16px; font-weight: 600; color: var(--success); margin-bottom: 4px;">45</div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--success);">45</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Artigos</div>
                                 </div>
-                                <div style="padding: 16px; background: #f0fdf4; border-radius: 8px;">
-                                    <div style="font-size: 16px; font-weight: 600; color: var(--warning); margin-bottom: 4px;">23</div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--warning);">23</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Vídeos</div>
                                 </div>
                             </div>
@@ -2077,35 +2183,7 @@ function navigateTo(page) {
             }
         });
 
-document.addEventListener('DOMContentLoaded', () => {
-  const btnNewUser       = document.getElementById('btnNewUser');
-  const newUserModal     = document.getElementById('newUserModal');
-  const closeNewUserBtn  = document.getElementById('closeNewUserModal');
-  const cancelNewUserBtn = document.getElementById('cancelNewUser');
-  const newUserForm      = document.getElementById('newUserForm');
-
-  // Abrir o modal
-  btnNewUser.addEventListener('click', () => {
-    console.log('👆 Clique em Novo Usuário detectado');
-    newUserModal.classList.remove('hidden');
-  });
-
-  // Fechar modal (× e Cancelar)
-  [closeNewUserBtn, cancelNewUserBtn].forEach(btn =>
-    btn.addEventListener('click', () => {
-      newUserModal.classList.add('hidden');
-      newUserForm.reset();
-    })
-  );
-
-  // Submeter cadastro
-  newUserForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    // (Aqui sua lógica de Auth + Firestore, idêntica à que já explicou antes)
-  });
-});
-
-// Funções de utilidade
+        // Funções de utilidade
         function formatCurrency(value) {
             return new Intl.NumberFormat('pt-BR', {
                 style: 'currency',
@@ -2345,6 +2423,66 @@ document.addEventListener('DOMContentLoaded', () => {
                     initRealtimeNotifications();
                 }, 1000);
             }
+        });
+
+        // Funções de exportação de dados
+        function exportToCSV(data, filename) {
+            const csv = data.map(row => Object.values(row).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Funções de relatórios
+        async function generateReport(type, dateRange) {
+            try {
+                let query = db.collection('activities');
+                
+                if (dateRange.start) {
+                    query = query.where('timestamp', '>=', dateRange.start);
+                }
+                if (dateRange.end) {
+                    query = query.where('timestamp', '<=', dateRange.end);
+                }
+                
+                const snapshot = await query.get();
+                const data = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                return data;
+            } catch (error) {
+                console.error('Erro ao gerar relatório:', error);
+                return [];
+            }
+        }
+
+        // Configurações de PWA (Progressive Web App)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        showNotification('PWA ativo', 'success');
+                    })
+                    .catch((registrationError) => {
+                        showNotification('Falha ao registrar service worker', 'error');
+                    });
+            });
+        }
+
+        // Detectar modo offline/online
+        window.addEventListener('online', () => {
+            showNotification('Conexão restaurada!', 'success');
+            processOfflineQueue();
+        });
+
+        window.addEventListener('offline', () => {
+            showNotification('Você está offline. Algumas funcionalidades podem não estar disponíveis.', 'warning');
         });
 
         // ----- Fila offline utilizando IndexedDB -----
@@ -2600,4 +2738,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showNotification('Plataforma Embalagens Conceito - Versão 1.0.0', 'info');
         showNotification('Desenvolvida com ❤️ para a equipe de vendas', 'info');
-
+    
