@@ -87,7 +87,10 @@ exports.updateUserRole = onCall(
 
 // Função callable para criação de usuários por administradores
 exports.createUser = onCall(
-  {region: "us-central1"},
+  {
+    region: "us-central1",
+    cors: true,
+  },
   async (req) => {
     const callerRole = req.auth && req.auth.token ? req.auth.token.role : null;
     if (callerRole !== "SUPER_ADMIN") {
