@@ -84,3 +84,45 @@ exports.updateUserRole = onCall(
     }
   },
 );
+
+// Função callable para criação de usuários por administradores
+exports.createUser = onCall(
+  {region: "us-central1"},
+  async (req) => {
+    const callerRole = req.auth && req.auth.token ? req.auth.token.role : null;
+    if (callerRole !== "SUPER_ADMIN") {
+      throw new HttpsError("permission-denied", "Acesso negado");
+    }
+
+    const {email, password, displayName = "", role = "USER"} = req.data;
+    const validRoles = [
+      "SUPER_ADMIN",
+      "USER_SDR",
+      "USER_VENDEDOR",
+      "MR_RESPONSAVEL",
+      "ADMIN_OPERACIONAL",
+      "ADMIN_CONTEUDO",
+      "ADMIN_GAMIFICACAO",
+      "USER",
+    ];
+    if (!validRoles.includes(role)) {
+      throw new HttpsError("invalid-argument", "Role inválida");
+    }
+
+    try {
+      const user = await getAuth().createUser({email, password, displayName});
+      await getAuth().setCustomUserClaims(user.uid, {role});
+      await getFirestore().collection("users").doc(user.uid).set({
+        email,
+        displayName,
+        role,
+        createdAt: FieldValue.serverTimestamp(),
+        isActive: true,
+      });
+      return {uid: user.uid};
+    } catch (err) {
+      console.error("Erro em createUser:", err);
+      throw new HttpsError("internal", err.message);
+    }
+  },
+);
