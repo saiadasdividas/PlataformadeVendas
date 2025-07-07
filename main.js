@@ -1,4 +1,4 @@
-// Configuração do Firebase em arquivo externo config.js
+        // Configuração do Firebase em arquivo externo config.js
 
 // Inicializar Firebase
 const auth = firebase.auth();
@@ -23,8 +23,8 @@ const navConfig = {
     ADMIN_OPERACIONAL: ['dashboard','academia','gamificacao','crm','perfil','admin'],
     ADMIN_CONTEUDO: ['dashboard','academia','perfil','admin'],
     ADMIN_GAMIFICACAO: ['dashboard','academia','gamificacao','perfil','admin'],
-    USER_SDR: ['dashboard','academia','crm','perfil'],
-    USER_VENDEDOR: ['dashboard','crm','perfil'],
+    USER_SDR: ['dashboard','academia','crm','perfil','gamificacao'],
+    USER_VENDEDOR: ['dashboard','crm','perfil','gamificacao'],
     MR_RESPONSAVEL: ['dashboard','academia','perfil'],
     USER: ['dashboard','perfil']
 };
@@ -42,6 +42,13 @@ function renderMenuForRole(role) {
     };
 
     const menu = document.getElementById('navMenu');
+    if (!menu) {
+        console.error('Elemento navMenu não encontrado no DOM');
+        return;
+    }
+
+    // Limpa itens existentes para evitar duplicações quando a função é chamada
+    // múltiplas vezes (ex.: após novo login ou atualização de permissões)
     menu.innerHTML = '';
 
     (navConfig[role] || navConfig.USER).forEach(page => {
@@ -59,12 +66,8 @@ function renderMenuForRole(role) {
             navigateTo(page);
         });
         
-    menu.appendChild(a);
-  });
-}
-
-function configureMenu() {
-    renderMenuForRole(userRole);
+        menu.appendChild(a);
+    });
 }
 
 // Elementos DOM
@@ -91,7 +94,7 @@ auth.onAuthStateChanged(async (user) => {
         userRole = idTokenResult.claims.role || 'USER';
         currentUser = user;
 
-        await loadUserData();    // já existente: carrega dados do Firestore
+        await loadUserData();    // carrega dados do Firestore
         renderMenuForRole(userRole); // monta o menu de acordo com a role
         showMainApp();
         loadPage(currentPage);
@@ -191,7 +194,8 @@ async function loadUserData() {
         if (userDoc.exists) {
             const userData = userDoc.data();
             console.log('Dados do usuário carregados:', userData);
-            // Aqui você pode processar os dados do usuário conforme necessário
+                filterMenuByRole(userData.role);
+            
         }
     } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -298,7 +302,7 @@ function loadAdmin() {
                     document.getElementById('userAvatar').textContent = (userData.profile?.name || currentUser.email).charAt(0).toUpperCase();
                     document.getElementById('userPoints').textContent = `${userData.stats?.totalPoints || 0} pts`;
                     
-                    configureMenu();
+
                 } else {
                     // Criar perfil padrão se não existir
                     await createDefaultUserProfile();
@@ -1679,7 +1683,10 @@ function loadAdmin() {
                             <h4 style="margin-bottom: 16px;">Usuários Recentes</h4>
                             <div class="user-list">
                                 <div class="user-item" style="display: flex; align-items: center; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;">
-                                    <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">JS</div>
+                                    <div style="width: 40px; height: 40
+
+
+px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">JS</div>
                                     <div style="flex: 1;">
                                         <div style="font-weight: 600;">João Silva</div>
                                         <div style="font-size: 12px; color: var(--text-light);">SDR - Cadastrado hoje</div>
@@ -1721,16 +1728,16 @@ function loadAdmin() {
                         <div class="content-stats">
                             <h4 style="margin-bottom: 16px;">Estatísticas de Conteúdo</h4>
                             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                                <div style="padding: 16px; background: #f0f9ff; border-radius: 8px;">
-                                    <div style="font-size: 16px; font-weight: 600; color: var(--primary); margin-bottom: 4px;">16</div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary);">16</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Módulos</div>
                                 </div>
-                                <div style="padding: 16px; background: #f0fdf4; border-radius: 8px;">
-                                    <div style="font-size: 16px; font-weight: 600; color: var(--success); margin-bottom: 4px;">45</div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--success);">45</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Artigos</div>
                                 </div>
-                                <div style="padding: 16px; background: #f0fdf4; border-radius: 8px;">
-                                    <div style="font-size: 16px; font-weight: 600; color: var(--warning); margin-bottom: 4px;">23</div>
+                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--warning);">23</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Vídeos</div>
                                 </div>
                             </div>
@@ -2128,14 +2135,6 @@ function loadAdmin() {
         document.addEventListener('DOMContentLoaded', () => {
             showNotification('Aplicação iniciada', 'success');
 
-            // Verificar se há usuário logado
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    showNotification('Usuário logado: ' + user.email, 'success');
-                } else {
-                    showNotification('Usuário não logado', 'info');
-                }
-            });
 
             const prospectForm = document.getElementById('addProspectForm');
             if (prospectForm) {
@@ -2168,52 +2167,6 @@ function loadAdmin() {
             }
 
             const feedbackForm = document.getElementById('feedbackForm');
-            const userForm = document.getElementById('addUserForm');
-            if (userForm) {
-                userForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    try {
-                        const response = await fetch('https://us-central1-plataforma-de-vendas-a87c2.cloudfunctions.net/createUserHttp', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                email: document.getElementById('newUserEmail').value,
-                                password: document.getElementById('newUserPassword').value,
-                                displayName: document.getElementById('newUserName').value,
-                                role: document.getElementById('newUserRole').value
-                            })
-                        });
-                        if (!response.ok) {
-                            const errorData = await response.json();
-                            throw new Error(errorData.error || 'Erro desconhecido');
-                        }
-                        userForm.reset();
-                        closeModal('addUserModal');
-                        showNotification('Usuário criado com sucesso', 'success');
-                    } catch (err) {
-                        console.error('Erro ao criar usuário', err);
-                        showNotification('Erro ao criar usuário: ' + err.message, 'error');
-                    }
-                });
-            }
-
-            const campaignForm = document.getElementById('addCampaignForm');
-            if (campaignForm) {
-                campaignForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    await db.collection('campaigns').add({
-                        name: document.getElementById('campaignName').value,
-                        description: document.getElementById('campaignDescription').value,
-                        goal: parseFloat(document.getElementById('campaignGoal').value),
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    campaignForm.reset();
-                    closeModal('addCampaignModal');
-                    showNotification('Campanha criada', 'success');
-                });
-            }
             if (feedbackForm) {
                 feedbackForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
@@ -2446,22 +2399,22 @@ function loadAdmin() {
 
         // Sistema de notificações em tempo real
         function initRealtimeNotifications() {
-            if (!currentUser) return;
-            
-            db.collection('notifications')
-                .where('userId', '==', currentUser.uid)
-                .where('read', '==', false)
-                .onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === 'added') {
-                            const notification = change.doc.data();
-                            showNotification(notification.message, notification.type);
-                        }
-                    });
-                }, err => {
-                    console.error('Erro em notificações em tempo real:', err);
-                });
-        }
+  if (!currentUser) return;
+
+  try {
+    db.collection('notifications')
+      .where('userId', '==', currentUser.uid)
+      .where('read', '==', false)
+      .onSnapshot(snapshot => {
+        // … seu código de notificação …
+      });
+  } catch (err) {
+    console.warn(
+      'Não foi possível iniciar notificações em tempo real:',
+      err.message
+    );
+  }
+}
 
         // Inicializar notificações em tempo real quando o usuário fizer login
         auth.onAuthStateChanged((user) => {
@@ -2785,26 +2738,4 @@ function loadAdmin() {
 
         showNotification('Plataforma Embalagens Conceito - Versão 1.0.0', 'info');
         showNotification('Desenvolvida com ❤️ para a equipe de vendas', 'info');
-
-        // Função para criar usuário via Callable Function (exemplo)
-async function callCreateUser(email, password) {
-  // Garante que o SDK Functions está carregado
-  if (!firebase.functions) {
-    alert('Firebase Functions SDK não carregado!');
-    return;
-  }
-  // Aponta para a região correta
-  const functions = firebase.app().functions('us-central1');
-  const createUser = functions.httpsCallable('createUser');
-  try {
-    const result = await createUser({ email, password });
-    alert('Usuário criado! UID: ' + result.data.uid);
-    console.log('UID criado:', result.data.uid);
-  } catch (err) {
-    alert('Erro ao criar usuário: ' + (err.message || err));
-    console.error('Erro:', err);
-  }
-}
-// Exemplo de uso (remova do final do arquivo se não quiser rodar sempre):
-// callCreateUser('x@x.com', '123456');
-
+    
