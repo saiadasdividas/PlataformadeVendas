@@ -2173,23 +2173,28 @@ function loadAdmin() {
                 userForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     try {
-
-                        const createUser = firebase
-                            .app()
-                            .functions('us-central1')
-                            .httpsCallable('createUser');
-                        await createUser({
-                            email: document.getElementById('newUserEmail').value,
-                            password: document.getElementById('newUserPassword').value,
-                            displayName: document.getElementById('newUserName').value,
-                            role: document.getElementById('newUserRole').value
+                        const response = await fetch('https://us-central1-plataforma-de-vendas-a87c2.cloudfunctions.net/createUserHttp', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                email: document.getElementById('newUserEmail').value,
+                                password: document.getElementById('newUserPassword').value,
+                                displayName: document.getElementById('newUserName').value,
+                                role: document.getElementById('newUserRole').value
+                            })
                         });
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || 'Erro desconhecido');
+                        }
                         userForm.reset();
                         closeModal('addUserModal');
                         showNotification('Usuário criado com sucesso', 'success');
                     } catch (err) {
                         console.error('Erro ao criar usuário', err);
-                        showNotification('Erro ao criar usuário', 'error');
+                        showNotification('Erro ao criar usuário: ' + err.message, 'error');
                     }
                 });
             }
