@@ -1,4 +1,4 @@
-        // Configuração do Firebase em arquivo externo config.js
+// Configuração do Firebase em arquivo externo config.js
 
 // Inicializar Firebase
 const auth = firebase.auth();
@@ -1675,10 +1675,7 @@ function loadAdmin() {
                             <h4 style="margin-bottom: 16px;">Usuários Recentes</h4>
                             <div class="user-list">
                                 <div class="user-item" style="display: flex; align-items: center; padding: 12px; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 8px;">
-                                    <div style="width: 40px; height: 40
-
-
-px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">JS</div>
+                                    <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; margin-right: 12px;">JS</div>
                                     <div style="flex: 1;">
                                         <div style="font-weight: 600;">João Silva</div>
                                         <div style="font-size: 12px; color: var(--text-light);">SDR - Cadastrado hoje</div>
@@ -1720,16 +1717,16 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                         <div class="content-stats">
                             <h4 style="margin-bottom: 16px;">Estatísticas de Conteúdo</h4>
                             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
-                                    <div style="font-size: 20px; font-weight: 700; color: var(--primary);">16</div>
+                                <div style="padding: 16px; background: #f0f9ff; border-radius: 8px;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--primary); margin-bottom: 4px;">16</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Módulos</div>
                                 </div>
-                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
-                                    <div style="font-size: 20px; font-weight: 700; color: var(--success);">45</div>
+                                <div style="padding: 16px; background: #f0fdf4; border-radius: 8px;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--success); margin-bottom: 4px;">45</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Artigos</div>
                                 </div>
-                                <div style="text-align: center; padding: 16px; background: #f8fafc; border-radius: 8px;">
-                                    <div style="font-size: 20px; font-weight: 700; color: var(--warning);">23</div>
+                                <div style="padding: 16px; background: #f0fdf4; border-radius: 8px;">
+                                    <div style="font-size: 16px; font-weight: 600; color: var(--warning); margin-bottom: 4px;">23</div>
                                     <div style="font-size: 12px; color: var(--text-light);">Vídeos</div>
                                 </div>
                             </div>
@@ -2738,4 +2735,26 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
 
         showNotification('Plataforma Embalagens Conceito - Versão 1.0.0', 'info');
         showNotification('Desenvolvida com ❤️ para a equipe de vendas', 'info');
-    
+
+        // Função para criar usuário via Callable Function (exemplo)
+async function callCreateUser(email, password) {
+  // Garante que o SDK Functions está carregado
+  if (!firebase.functions) {
+    alert('Firebase Functions SDK não carregado!');
+    return;
+  }
+  // Aponta para a região correta
+  const functions = firebase.app().functions('us-central1');
+  const createUser = functions.httpsCallable('createUser');
+  try {
+    const result = await createUser({ email, password });
+    alert('Usuário criado! UID: ' + result.data.uid);
+    console.log('UID criado:', result.data.uid);
+  } catch (err) {
+    alert('Erro ao criar usuário: ' + (err.message || err));
+    console.error('Erro:', err);
+  }
+}
+// Exemplo de uso (remova do final do arquivo se não quiser rodar sempre):
+// callCreateUser('x@x.com', '123456');
+
