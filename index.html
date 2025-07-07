@@ -179,6 +179,65 @@
             </form>
         </div>
     </div>
+    <div id="addUserModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Novo Usuário</h2>
+                <button class="close-btn" onclick="closeModal('addUserModal')">&times;</button>
+            </div>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label class="form-label">Nome</label>
+                    <input type="text" id="newUserName" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="newUserEmail" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Senha</label>
+                    <input type="password" id="newUserPassword" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select id="newUserRole" class="input">
+                        <option value="USER">Usuário</option>
+                        <option value="USER_SDR">User SDR</option>
+                        <option value="USER_VENDEDOR">User Vendedor</option>
+                        <option value="MR_RESPONSAVEL">MR Responsável</option>
+                        <option value="ADMIN_OPERACIONAL">Admin Operacional</option>
+                        <option value="ADMIN_CONTEUDO">Admin Conteúdo</option>
+                        <option value="ADMIN_GAMIFICACAO">Admin Gamificação</option>
+                        <option value="SUPER_ADMIN">Super Admin</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Criar</button>
+            </form>
+        </div>
+    </div>
+    <div id="addCampaignModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nova Campanha</h2>
+                <button class="close-btn" onclick="closeModal('addCampaignModal')">&times;</button>
+            </div>
+            <form id="addCampaignForm">
+                <div class="form-group">
+                    <label class="form-label">Nome</label>
+                    <input type="text" id="campaignName" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <textarea id="campaignDescription" class="input" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Meta (R$)</label>
+                    <input type="number" id="campaignGoal" class="input" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
  <script src="config.js"></script>
 <script src="main.js"></script>
 </body>
