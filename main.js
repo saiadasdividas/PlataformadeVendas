@@ -2181,10 +2181,6 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                             .app()
                             .functions('us-central1')
                             .httpsCallable('createUser');
-siwydj-codex/corrigir-funcionamento-dos-botões--novo-usuario--e--nova-cam
-
-
- main
                         await createUser({
                             email: document.getElementById('newUserEmail').value,
                             password: document.getElementById('newUserPassword').value,
