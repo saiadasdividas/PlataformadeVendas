@@ -2078,32 +2078,31 @@ function navigateTo(page) {
         });
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('✅ DOM carregado — iniciando listeners');
-
   const btnNewUser       = document.getElementById('btnNewUser');
   const newUserModal     = document.getElementById('newUserModal');
   const closeNewUserBtn  = document.getElementById('closeNewUserModal');
   const cancelNewUserBtn = document.getElementById('cancelNewUser');
   const newUserForm      = document.getElementById('newUserForm');
 
-  if (btnNewUser && newUserModal && closeNewUserBtn && cancelNewUserBtn && newUserForm) {
-    btnNewUser.addEventListener('click', () => {
-      console.log('👆 Clique em Novo Usuário detectado');
-      newUserModal.classList.remove('hidden');
-    });
+  // Abrir o modal
+  btnNewUser.addEventListener('click', () => {
+    console.log('👆 Clique em Novo Usuário detectado');
+    newUserModal.classList.remove('hidden');
+  });
 
-    [closeNewUserBtn, cancelNewUserBtn].forEach(btn =>
-      btn.addEventListener('click', () => {
-        newUserModal.classList.add('hidden');
-        newUserForm.reset();
-      })
-    );
+  // Fechar modal (× e Cancelar)
+  [closeNewUserBtn, cancelNewUserBtn].forEach(btn =>
+    btn.addEventListener('click', () => {
+      newUserModal.classList.add('hidden');
+      newUserForm.reset();
+    })
+  );
 
-    newUserForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      // … lógia de criação de usuário …
-    });
-  }
+  // Submeter cadastro
+  newUserForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    // (Aqui sua lógica de Auth + Firestore, idêntica à que já explicou antes)
+  });
 });
 
 // Funções de utilidade
