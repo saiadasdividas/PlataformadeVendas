@@ -2176,12 +2176,16 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                 userForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     try {
+ tz9dtd-codex/corrigir-funcionamento-dos-botões--novo-usuario--e--nova-cam
                         // Use firebase.app().functions('us-central1') to ensure the
                         // callable Functions SDK is available when using the compat version
                         const createUser = firebase
                             .app()
                             .functions('us-central1')
                             .httpsCallable('createUser');
+
+                        const createUser = firebase.functions().httpsCallable('createUser');
+ main
                         await createUser({
                             email: document.getElementById('newUserEmail').value,
                             password: document.getElementById('newUserPassword').value,
