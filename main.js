@@ -2176,11 +2176,15 @@ px; background: var(--primary); border-radius: 50%; display: flex; align-items: 
                 userForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     try {
-                        // Use firebase.app().functions('us-central1') for callable support when using the compat SDK
+
                         const createUser = firebase
                             .app()
                             .functions('us-central1')
                             .httpsCallable('createUser');
+siwydj-codex/corrigir-funcionamento-dos-botões--novo-usuario--e--nova-cam
+
+
+ main
                         await createUser({
                             email: document.getElementById('newUserEmail').value,
                             password: document.getElementById('newUserPassword').value,
