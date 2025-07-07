@@ -118,42 +118,79 @@
         <div class="main-content">
             <header class="header">
                 <h1 class="header-title" id="pageTitle">Dashboard</h1>
-                <div class="header-actions">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="input" placeholder="Buscar...">
-                    </div>
-                    <button class="notification-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
+                <!-- Painel Administrativo: ações -->
+                <div class="panel-actions mt-4 flex space-x-2">
+                  <button
+                    id="btnNewUser"
+                    class="btn-primary flex items-center space-x-2"
+                    type="button"
+                  >
+                    <i class="fas fa-user-plus"></i>
+                    <span>Novo Usuário</span>
+                  </button>
+                  <button
+                    id="btnNewCampaign"
+                    class="btn-secondary flex items-center space-x-2"
+                    type="button"
+                  >
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Nova Campanha</span>
+                  </button>
                 </div>
             </header>
-            
             <div class="content-area" id="contentArea">
                 <!-- O conteúdo será carregado dinamicamente aqui -->
             </div>
         </div>
     </div> <!-- mainApp -->
 
-    <!-- Novo Usuário Modal -->
-    <div id="newUserModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <!-- Novo Usuário Modal (voltar ao original) -->
+    <div
+      id="newUserModal"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
       <div class="glass-card w-full max-w-lg mx-4 relative p-6">
-        <button id="closeNewUserModal" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800">&times;</button>
+        <!-- Botão fechar -->
+        <button
+          id="closeNewUserModal"
+          class="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+          type="button"
+        >&times;</button>
+
         <h2 class="text-2xl font-semibold mb-4">Adicionar Novo Usuário</h2>
+
         <form id="newUserForm" class="space-y-4">
+          <!-- Nome -->
           <div>
             <label for="newUserName" class="block text-sm font-medium">Nome</label>
-            <input type="text" id="newUserName" class="form-input mt-1 w-full" required>
+            <input
+              type="text"
+              id="newUserName"
+              class="form-input mt-1 w-full"
+              required
+            />
           </div>
+          <!-- Email -->
           <div>
             <label for="newUserEmail" class="block text-sm font-medium">Email</label>
-            <input type="email" id="newUserEmail" class="form-input mt-1 w-full" required>
+            <input
+              type="email"
+              id="newUserEmail"
+              class="form-input mt-1 w-full"
+              required
+            />
           </div>
+          <!-- Senha -->
           <div>
             <label for="newUserPassword" class="block text-sm font-medium">Senha</label>
-            <input type="password" id="newUserPassword" class="form-input mt-1 w-full" required>
+            <input
+              type="password"
+              id="newUserPassword"
+              class="form-input mt-1 w-full"
+              required
+            />
           </div>
+          <!-- Nível de Acesso -->
           <div>
             <label for="newUserRole" class="block text-sm font-medium">Nível de Acesso</label>
             <select id="newUserRole" class="form-input mt-1 w-full">
@@ -162,8 +199,13 @@
               <option value="USER_ADMIN">Administrador</option>
             </select>
           </div>
-          <div class="flex justify-end space-x-2">
-            <button type="button" id="cancelNewUser" class="btn-secondary px-4 py-2">Cancelar</button>
+          <!-- Ações -->
+          <div class="flex justify-end space-x-2 mt-6">
+            <button
+              type="button"
+              id="cancelNewUser"
+              class="btn-secondary px-4 py-2"
+            >Cancelar</button>
             <button type="submit" class="btn-primary px-4 py-2">Criar Usuário</button>
           </div>
         </form>
