@@ -59,8 +59,12 @@ function renderMenuForRole(role) {
             navigateTo(page);
         });
         
-        menu.appendChild(a);
-    });
+    menu.appendChild(a);
+  });
+}
+
+function configureMenu() {
+    renderMenuForRole(userRole);
 }
 
 // Elementos DOM
